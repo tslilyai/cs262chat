@@ -1,0 +1,46 @@
+syntax = "proto2";
+
+package chatapp;
+
+service ChatApp {
+    rpc rpc_send_message(CMessage) returns (Response) {}
+    rpc rpc_get_messages(User) returns (stream CMessage) {}
+    rpc rpc_create_group(Group) returns (Response) {}
+    rpc rpc_create_account(User) returns (Response) {}
+    rpc rpc_remove_account(User) returns (Response) {}
+    rpc rpc_edit_group_name(Group) returns (Response) {}
+    rpc rpc_remove_group_member(Group) returns (Response) {}
+    rpc rpc_add_group_member(Group) returns (Response) {}
+    rpc rpc_list_group_members(Group) returns (stream User) {}
+    rpc rpc_list_groups(Pattern) returns (stream Group) {}
+    rpc rpc_list_accounts(Pattern) returns (stream User) {}
+}
+
+message CMessage {
+    optional int64 m_id = 1;
+    required int64 to_id = 2;
+    required int64 from_id = 3;
+    optional string msg = 4;
+}
+
+message User {
+    optional int64 u_id = 1;
+    optional string username = 2;
+    optional string password = 3;
+}
+
+message Group {
+    optional int64 g_id = 1;
+    optional string g_name = 2;
+    repeated int64 member_ids = 3;
+    optional int64 edit_member_id = 4;
+}
+
+message Response {
+    optional int32 errno = 1;
+    optional string msg = 2;
+}
+
+message Pattern {
+    required string pattern = 1;
+}
