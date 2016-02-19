@@ -3,7 +3,8 @@ syntax = "proto2";
 package chatapp;
 
 service ChatApp {
-    rpc rpc_send_message(CMessage) returns (Response) {}
+    rpc rpc_send_individual_message(CMessage) returns (Response) {}
+    rpc rpc_send_group_message(CMessage) returns (Response) {}
     rpc rpc_get_messages(User) returns (stream CMessage) {}
     rpc rpc_create_group(Group) returns (Response) {}
     rpc rpc_create_account(User) returns (Response) {}
@@ -18,8 +19,8 @@ service ChatApp {
 
 message CMessage {
     optional int64 m_id = 1;
-    required int64 to_id = 2;
-    required int64 from_id = 3;
+    required string to_name = 2;
+    required string from_name = 3;
     optional string msg = 4;
 }
 
@@ -33,7 +34,7 @@ message Group {
     optional int64 g_id = 1;
     optional string g_name = 2;
     repeated int64 member_ids = 3;
-    optional int64 edit_member_id = 4;
+    optional string edit_member_name = 4;
     optional string new_name = 5;
 }
 
