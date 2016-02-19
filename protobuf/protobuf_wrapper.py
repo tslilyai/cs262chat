@@ -10,28 +10,37 @@ _TIMEOUT_SECONDS = 30
 
 class Protobuf_Protocol(object):
     # RUN
-    def client_run(self, port):
+    def client_run(self, username, port):
         self.Channel = implementations.insecure_channel('localhost', port)
         self.Stub = service_pb2.beta_create_ChatApp_stub(channel)
+        self.Username = username
 
     # MESSAGING 
-    def send_message(self, src, dest, msg):
+    def send_individual_message(self, src, dest, msg):
         message = obj.CMessage(
-            to_id = dest,
-            from_id = src,
+            to_name = dest,
+            from_name = src,
             msg = msg
         )
-        response = self.Stub.rpc_send_message(message, _TIMEOUT_SECONDS)
+        response = self.Stub.rpc_send_individual_message(message, _TIMEOUT_SECONDS)
+        if response.errno:
+            print "Error: ", response.msg
+        else: 
+            print "success"
+    def send_group_message(self, src, dest, msg):
+        message = obj.CMessage(
+            to_name = dest,
+            from_name = src,
+            msg = msg
+        )
+        response = self.Stub.rpc_send_group_message(message, _TIMEOUT_SECONDS)
         if response.errno:
             print "Error: ", response.msg
         else: 
             print "success"
     def get_messages(self, dest):
-        #XXX how do we store the client's user state to set username or u_id when we call this function?
         user = obj.User(
             username = self.Username
-            password = self.Password
-            u_id = self.U_id
         )
         messages = self.Stub.rpc_get_messages(user, _TIMEOUT_SECONDS)
         return [(m.from_id, m.msg) for m in messages]
@@ -68,16 +77,14 @@ class Protobuf_Protocol(object):
         else: 
             print "success"
     def remove_group_member(self, groupname, member):
-        # XXX we'll need to know the member id when we call the function? where will this be stored?
-        group = obj.User(g_name=groupname, edit_member_id=member)
+        group = obj.User(g_name=groupname, edit_member_name=member)
         response = self.Stub.rpc_remove_group_member(group, _TIMEOUT_SECONDS)
         if response.errno:
             print "Error: ", response.msg
         else: 
             print "success"
     def add_group_member(self, groupname, member):
-        # XXX see comment above
-        group = obj.User(g_name=groupname, edit_member_id=member)
+        group = obj.User(g_name=groupname, edit_member_name=member)
         response = self.Stub.rpc_add_group_member(group, _TIMEOUT_SECONDS)
         if response.errno:
             print "Error: ", response.msg
@@ -93,11 +100,9 @@ class Protobuf_Protocol(object):
     def list_accounts(self, pattern):
         pattern = obj.Pattern(pattern=pattern) 
         users = self.Stub.rpc_list_users(pattern, _TIMEOUT_SECONDS)
-        # XXX username might not be unique?
         return [u.username for u in users]
 
     def list_group_members(self, groupname):
-        # XXX what if groups aren't unique?
         group = obj.Group(
             g_name=groupname
         )
