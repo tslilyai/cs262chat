@@ -34,7 +34,7 @@ message Group {
     optional string g_name = 2;
     repeated int64 member_ids = 3;
     optional int64 edit_member_id = 4;
-    optional string new_name = 4;
+    optional string new_name = 5;
 }
 
 message Response {

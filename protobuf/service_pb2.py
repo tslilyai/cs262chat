@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='service.proto',
   package='chatapp',
   syntax='proto2',
-  serialized_pb=_b('\n\rservice.proto\x12\x07\x63hatapp\"E\n\x08\x43Message\x12\x0c\n\x04m_id\x18\x01 \x01(\x03\x12\r\n\x05to_id\x18\x02 \x02(\x03\x12\x0f\n\x07\x66rom_id\x18\x03 \x02(\x03\x12\x0b\n\x03msg\x18\x04 \x01(\t\"8\n\x04User\x12\x0c\n\x04u_id\x18\x01 \x01(\x03\x12\x10\n\x08username\x18\x02 \x01(\t\x12\x10\n\x08password\x18\x03 \x01(\t\"Q\n\x05Group\x12\x0c\n\x04g_id\x18\x01 \x01(\x03\x12\x0e\n\x06g_name\x18\x02 \x01(\t\x12\x12\n\nmember_ids\x18\x03 \x03(\x03\x12\x16\n\x0e\x65\x64it_member_id\x18\x04 \x01(\x03\"&\n\x08Response\x12\r\n\x05\x65rrno\x18\x01 \x01(\x05\x12\x0b\n\x03msg\x18\x02 \x01(\t\"\x1a\n\x07Pattern\x12\x0f\n\x07pattern\x18\x01 \x02(\t2\x95\x05\n\x07\x43hatApp\x12:\n\x10rpc_send_message\x12\x11.chatapp.CMessage\x1a\x11.chatapp.Response\"\x00\x12\x38\n\x10rpc_get_messages\x12\r.chatapp.User\x1a\x11.chatapp.CMessage\"\x00\x30\x01\x12\x37\n\x10rpc_create_group\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12\x38\n\x12rpc_create_account\x12\r.chatapp.User\x1a\x11.chatapp.Response\"\x00\x12\x38\n\x12rpc_remove_account\x12\r.chatapp.User\x1a\x11.chatapp.Response\"\x00\x12:\n\x13rpc_edit_group_name\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12>\n\x17rpc_remove_group_member\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12;\n\x14rpc_add_group_member\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12;\n\x16rpc_list_group_members\x12\x0e.chatapp.Group\x1a\r.chatapp.User\"\x00\x30\x01\x12\x37\n\x0frpc_list_groups\x12\x10.chatapp.Pattern\x1a\x0e.chatapp.Group\"\x00\x30\x01\x12\x38\n\x11rpc_list_accounts\x12\x10.chatapp.Pattern\x1a\r.chatapp.User\"\x00\x30\x01')
+  serialized_pb=_b('\n\rservice.proto\x12\x07\x63hatapp\"E\n\x08\x43Message\x12\x0c\n\x04m_id\x18\x01 \x01(\x03\x12\r\n\x05to_id\x18\x02 \x02(\x03\x12\x0f\n\x07\x66rom_id\x18\x03 \x02(\x03\x12\x0b\n\x03msg\x18\x04 \x01(\t\"8\n\x04User\x12\x0c\n\x04u_id\x18\x01 \x01(\x03\x12\x10\n\x08username\x18\x02 \x01(\t\x12\x10\n\x08password\x18\x03 \x01(\t\"c\n\x05Group\x12\x0c\n\x04g_id\x18\x01 \x01(\x03\x12\x0e\n\x06g_name\x18\x02 \x01(\t\x12\x12\n\nmember_ids\x18\x03 \x03(\x03\x12\x16\n\x0e\x65\x64it_member_id\x18\x04 \x01(\x03\x12\x10\n\x08new_name\x18\x05 \x01(\t\"&\n\x08Response\x12\r\n\x05\x65rrno\x18\x01 \x01(\x05\x12\x0b\n\x03msg\x18\x02 \x01(\t\"\x1a\n\x07Pattern\x12\x0f\n\x07pattern\x18\x01 \x01(\t2\x95\x05\n\x07\x43hatApp\x12:\n\x10rpc_send_message\x12\x11.chatapp.CMessage\x1a\x11.chatapp.Response\"\x00\x12\x38\n\x10rpc_get_messages\x12\r.chatapp.User\x1a\x11.chatapp.CMessage\"\x00\x30\x01\x12\x37\n\x10rpc_create_group\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12\x38\n\x12rpc_create_account\x12\r.chatapp.User\x1a\x11.chatapp.Response\"\x00\x12\x38\n\x12rpc_remove_account\x12\r.chatapp.User\x1a\x11.chatapp.Response\"\x00\x12:\n\x13rpc_edit_group_name\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12>\n\x17rpc_remove_group_member\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12;\n\x14rpc_add_group_member\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12;\n\x16rpc_list_group_members\x12\x0e.chatapp.Group\x1a\r.chatapp.User\"\x00\x30\x01\x12\x37\n\x0frpc_list_groups\x12\x10.chatapp.Pattern\x1a\x0e.chatapp.Group\"\x00\x30\x01\x12\x38\n\x11rpc_list_accounts\x12\x10.chatapp.Pattern\x1a\r.chatapp.User\"\x00\x30\x01')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -158,6 +158,13 @@ _GROUP = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='new_name', full_name='chatapp.Group.new_name', index=4,
+      number=5, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -171,7 +178,7 @@ _GROUP = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=155,
-  serialized_end=236,
+  serialized_end=254,
 )
 
 
@@ -208,8 +215,8 @@ _RESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=238,
-  serialized_end=276,
+  serialized_start=256,
+  serialized_end=294,
 )
 
 
@@ -222,7 +229,7 @@ _PATTERN = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='pattern', full_name='chatapp.Pattern.pattern', index=0,
-      number=1, type=9, cpp_type=9, label=2,
+      number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -239,8 +246,8 @@ _PATTERN = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=278,
-  serialized_end=304,
+  serialized_start=296,
+  serialized_end=322,
 )
 
 DESCRIPTOR.message_types_by_name['CMessage'] = _CMESSAGE
