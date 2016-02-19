@@ -9,6 +9,13 @@ import service_pb2 as obj
 _TIMEOUT_SECONDS = 30
 
 class Protobuf_Protocol(object):
+
+    def __get_response(response):
+        if response.errno:
+            return "Error: " + response.msg
+        else: 
+            return response.msg
+
     # RUN
     def client_run(self, username, port):
         self.Channel = implementations.insecure_channel('localhost', port)
@@ -22,22 +29,14 @@ class Protobuf_Protocol(object):
             from_name = src,
             msg = msg
         )
-        response = self.Stub.rpc_send_individual_message(message, _TIMEOUT_SECONDS)
-        if response.errno:
-            print "Error: ", response.msg
-        else: 
-            print "success"
+        return self.__get_response(self.Stub.rpc_send_individual_message(message, _TIMEOUT_SECONDS))
     def send_group_message(self, src, dest, msg):
         message = obj.CMessage(
             to_name = dest,
             from_name = src,
             msg = msg
         )
-        response = self.Stub.rpc_send_group_message(message, _TIMEOUT_SECONDS)
-        if response.errno:
-            print "Error: ", response.msg
-        else: 
-            print "success"
+        return self.__get_response(self.Stub.rpc_send_group_message(message, _TIMEOUT_SECONDS))
     def get_messages(self, dest):
         user = obj.User(
             username = self.Username
@@ -48,60 +47,34 @@ class Protobuf_Protocol(object):
     # CREATION AND DELETION 
     def create_group(self, groupname):
         group = obj.Group(g_name = groupname)
-        response = self.Stub.rpc_create_group(group, _TIMEOUT_SECONDS)
-        if response.errno:
-            print "Error: ", response.msg
-        else: 
-            print "success"
+        return self.__get_response(self.Stub.rpc_create_group(group, _TIMEOUT_SECONDS))
     def create_account(self, username):
         user = obj.User(username=username)
-        response = self.Stub.rpc_create_account(user, _TIMEOUT_SECONDS)
-        if response.errno:
-            print "Error: ", response.msg
-        else: 
-            print "success"
+        return self.__get_response(self.Stub.rpc_create_account(user, _TIMEOUT_SECONDS))
     def remove_account(self):
         user = obj.User(username=username)
-        response = self.Stub.rpc_remove_account(user, _TIMEOUT_SECONDS)
-        if response.errno:
-            print "Error: ", response.msg
-        else: 
-            print "success"
+        return self.__get_response(self.Stub.rpc_remove_account(user, _TIMEOUT_SECONDS))
 
     # GROUPS 
     def edit_group_name(self, old_name, new_name):
         group = obj.User(g_name=old_name, new_name=new_name)
-        response = self.Stub.rpc_edit_group_name(group, _TIMEOUT_SECONDS)
-        if response.errno:
-            print "Error: ", response.msg
-        else: 
-            print "success"
+        return self.__get_response(self.Stub.rpc_edit_group_name(group, _TIMEOUT_SECONDS))
     def remove_group_member(self, groupname, member):
         group = obj.User(g_name=groupname, edit_member_name=member)
-        response = self.Stub.rpc_remove_group_member(group, _TIMEOUT_SECONDS)
-        if response.errno:
-            print "Error: ", response.msg
-        else: 
-            print "success"
+        return self.__get_response(self.Stub.rpc_remove_group_member(group, _TIMEOUT_SECONDS))
     def add_group_member(self, groupname, member):
         group = obj.User(g_name=groupname, edit_member_name=member)
-        response = self.Stub.rpc_add_group_member(group, _TIMEOUT_SECONDS)
-        if response.errno:
-            print "Error: ", response.msg
-        else: 
-            print "success"
+        return self.__get_response(self.Stub.rpc_add_group_member(group, _TIMEOUT_SECONDS))
 
     # LISTING 
     def list_groups(self, pattern):
         pattern = obj.Pattern(pattern=pattern) 
         groups = self.Stub.rpc_list_groups(pattern, _TIMEOUT_SECONDS)
         return [g.g_name for g in groups]
-
     def list_accounts(self, pattern):
         pattern = obj.Pattern(pattern=pattern) 
         users = self.Stub.rpc_list_users(pattern, _TIMEOUT_SECONDS)
         return [u.username for u in users]
-
     def list_group_members(self, groupname):
         group = obj.Group(
             g_name=groupname

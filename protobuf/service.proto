@@ -21,7 +21,7 @@ message CMessage {
     optional int64 m_id = 1;
     required string to_name = 2;
     required string from_name = 3;
-    optional string msg = 4;
+    required string msg = 4;
 }
 
 message User {
@@ -32,7 +32,7 @@ message User {
 
 message Group {
     optional int64 g_id = 1;
-    optional string g_name = 2;
+    required string g_name = 2;
     repeated int64 member_ids = 3;
     optional string edit_member_name = 4;
     optional string new_name = 5;
@@ -40,9 +40,9 @@ message Group {
 
 message Response {
     optional int32 errno = 1;
-    optional string msg = 2;
+    required string msg = 2;
 }
 
 message Pattern {
-    optional string pattern = 1;
+    required string pattern = 1;
 }
