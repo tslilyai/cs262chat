@@ -43,5 +43,5 @@ message Response {
 }
 
 message Pattern {
-    required string pattern = 1;
+    optional string pattern = 1;
 }
