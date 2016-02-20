@@ -1,5 +1,29 @@
 '''
 The main function to start and run the client lives here!
+
+The front end will consist of a portion that shows all incoming messages (RHS of console) and a portion that acts as a command-line interface, accepting commands.
+
+The user can also enter "conversation thread mode," which transforms the command-line interface into a chat box with another user or group.
+
+Login and Account Creation: These must be called without being logged in.
+
+    > login [name]
+    > mk-user [name]
+
+Command Mode: These cannot be called without being logged in
+
+    > ls_groups [pattern (optional)]
+    > ls-users [pattern (optional)]
+    > ls-group-members [name] [pattern (optional)]
+    > mk-group [name] [users]
+    > send-msg [dest-name] [message]
+    > fetch-msgs
+    > logout
+
+Conversation Thread Mode
+Running `> enter-thread [groupname/username]` enters "conversation mode," in which you can send messages to a group or individual user simply by typing and pressing enter.
+
+Escape thread mode back to command mode simply by typing ESC.
 '''
 
 import sys
@@ -8,13 +32,14 @@ import protocols
 def main():
     protocol = sys.argv[1]
     port = sys.argv[2]
-    username = sys.argv[3]
     p = Protocol(p)
 
-    p.client_run(port)
+    p.client_run(username, port)
 
-    # read from console, run cmd (using p) 
-    '''
-    if cmd = get_messages:
-        p.get_messages()
-    '''
+    # do fancy setup stuff here to enter "command mode" and set up UI 
+
+    while(1):
+        # read from console, run cmd (using p) and handle output appropriately
+        
+        # poll server for new messages and display on RHS of screen
+        p.get_messages(username)

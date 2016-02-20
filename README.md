@@ -4,14 +4,39 @@ Chat Application for CS262: Introduction to Distributed Systems
 David Ding, Lily Tsai, Dan Fu, Ross Rheingans-Yoo
 
 # Running the Application
+We support two types of communication protocols: `protocol` can be one of either `protobuf` or `custom`.
 
-To start up a chat server: `python server_main.py [protocol] [port]`
+- To start up a chat server: `python server_main.py [protocol] [port]`
 
-To start up a chat client: `python client_main.py [protocol] [port] [username]`
+- To start up a chat client (logged in as user `username`): `python client_main.py [protocol] [port]`
 
-`protocol` can be one of either `protobuf` or `custom`.
 
 # Client API 
+The front end will consist of a portion that shows all incoming messages (RHS of console) and a portion that acts as a command-line interface, accepting commands.
+
+The user can also enter "conversation thread mode," which transforms the command-line interface into a chat box with another user or group.
+
+### Login and Account Creation
+These must be called without being logged in.
+
+    > login [name]
+    > mk-user [name]
+
+### Command Mode
+These cannot be called without being logged in
+
+    > ls_groups [pattern (optional)]
+    > ls-users [pattern (optional)]
+    > ls-group-members [name] [pattern (optional)]
+    > mk-group [name] [users]
+    > send-msg [dest-name] [message]
+    > fetch-msgs
+    > logout
+
+### Conversation Thread Mode
+Running `> enter-thread [groupname/username]` enters "conversation mode," in which you can send messages to a group or individual user simply by typing and pressing enter.
+
+Escape thread mode back to command mode simply by typing ESC.
 
 # Communication Protocol API
 This interface should be implemented by any protocol used by the chat server.
