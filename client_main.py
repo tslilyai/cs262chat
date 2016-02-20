@@ -7,6 +7,8 @@ import protocols
 
 def main():
     protocol = sys.argv[1]
+    port = sys.argv[2]
+    username = sys.argv[3]
     p = Protocol(p)
 
     p.client_run(port)
