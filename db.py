@@ -3,15 +3,30 @@ This file contains all functions necessary for the server to interface with the 
 '''
 
 import sqlite3
+import threading
+
+def thread_safe(fn):
+    def new_fn(*args, **kwargs):
+        try:
+            args[0].lock.acquire()
+            ret = fn(*args, **kwargs)
+            args[0].lock.release()
+            return ret
+        except Exception as e:
+            args[0].lock.release()
+            raise e
+    return new_fn
 
 class DBManager(object):
     def __init__(self):
         self.conn = sqlite3.connect('chatapp.db')
         self.c = self.conn.cursor()
+        self.lock = threading.Lock()
 
     def __del__(self):
         self.conn.close()
 
+    @thread_safe
     def create_tables(self):
         self.c.execute("""
             CREATE TABLE users (u_id int NOT NULL PRIMARY KEY, username varchar(255) UNIQUE)
@@ -27,6 +42,7 @@ class DBManager(object):
         """)
         self.conn.commit()
 
+    @thread_safe
     def insert_message(self, to_id, from_id, msg):
         if len(msg) > 1023:
             raise Exception('Message string too long')
@@ -47,6 +63,7 @@ class DBManager(object):
                        """, [v + 1, to_id, from_id, msg])
         self.conn.commit()
 
+    @thread_safe
     def get_user_id(self, uname):
         self.c.execute("SELECT u_id FROM users WHERE username=?", [uname])
         v = self.c.fetchone()
@@ -55,6 +72,7 @@ class DBManager(object):
 
         return v[0]
 
+    @thread_safe
     def get_group_id(self, gname):
         self.c.execute("SELECT g_id FROM groups WHERE gname=?", [gname])
         v = self.c.fetchone()
@@ -63,6 +81,7 @@ class DBManager(object):
 
         return v[0]
 
+    @thread_safe
     def get_messages(self, u_id):
         self.c.execute("""
             SELECT messages.m_id, messages.to_id, messages.from_id, messages.msg
@@ -76,6 +95,7 @@ class DBManager(object):
             raise Exception('No messages')
         return v
 
+    @thread_safe
     def create_group(self, gname):
         self.c.execute("SELECT g_id FROM groups ORDER BY g_id DESC LIMIT 1")
         v = self.c.fetchone()
@@ -92,6 +112,7 @@ class DBManager(object):
                        """, [v + 2, gname])
         self.conn.commit()
 
+    @thread_safe
     def create_account(self, uname):
         self.c.execute("SELECT u_id FROM users ORDER BY u_id DESC LIMIT 1")
         v = self.c.fetchone()
@@ -121,6 +142,7 @@ class DBManager(object):
                        """, [npairs + 1, v + 2, v + 2])
         self.conn.commit()
 
+    @thread_safe
     def add_group_member(self, gname, uname):
         self.c.execute("SELECT u_id FROM users WHERE username=?", [uname])
         u_id = self.c.fetchone()
@@ -152,6 +174,7 @@ class DBManager(object):
         self.conn.commit()
 
 
+    @thread_safe
     def remove_account(self, uname):
         self.c.execute("SELECT u_id FROM users WHERE username=?", [uname])
         v = self.c.fetchone()
