@@ -82,7 +82,7 @@ class ProtobufServer(service_pb2.beta_create_ChatApp_server):
 
     def rpc_add_group_member(self, request, context):
         try:
-            self.db.remove_group_member(request.g_name, request.edit_member_name)
+            self.db.add_move_member(request.g_name, request.edit_member_name)
         except Exception as e:
             return obj.Response(errno=1, msg=e)
         return obj.Response(errno=0, msg="success!\n")
