@@ -181,6 +181,58 @@ class DBManager(object):
         self.c.execute("DELETE FROM user_group_pairs WHERE u_id=?", [v])
         self.conn.commit()
 
+    @thread_safe
+    def remove_group_member(self, gname, uname):
+        self.c.execute("SELECT u_id FROM users WHERE username=?", [uname])
+        uid = self.c.fetchone()
+        if uid is None:
+            raise Exception("User doesn't exist")
+        else:
+            uid = uid[0]
+
+        self.c.execute("SELECT g_id FROM groups WHERE gname=?", [gname])
+        gid = self.c.fetchone()
+        if gid is None:
+            raise Exception("Group doesn't exist")
+        else:
+            gid = gid[0]
+
+        self.c.execute("DELETE FROM user_group_pairs WHERE u_id=? AND g_id=?", [uid, gid])
+        self.conn.commit()
+
+    @thread_safe
+    def edit_group_name(self, gname, newname):
+        self.c.execute("UPDATE groups SET gname=? WHERE gname=?", [newname, gname])
+        self.conn.commit()
+
+    @thread_safe
+    def get_groups(self, pattern):
+        self.c.execute("SELECT g_id, gname FROM groups WHERE gname LIKE ?", [pattern])
+        v = self.c.fetchall()
+        if v is None:
+            return []
+        return v
+
+    @thread_safe
+    def get_accounts(self, pattern):
+        self.c.execute("SELECT u_id, username FROM users WHERE username LIKE ? ORDER BY u_id ASC", [pattern])
+        v = self.c.fetchall()
+        if v is None:
+            return []
+        return v
+
+    @thread_safe
+    def get_group_members(self, gname):
+        self.c.execute("""
+            SELECT users.u_id, users.username FROM
+                users INNER JOIN user_group_pairs ON users.u_id=user_group_pairs.u_id
+                INNER JOIN groups ON user_group_pairs.g_id=groups.g_id
+                WHERE groups.gname=?""", [gname])
+        v = self.c.fetchall()
+        if v is None:
+            return []
+        return v
+
 if __name__ == '__main__':
     db = DBManager()
     db.create_tables()
@@ -221,6 +273,16 @@ if __name__ == '__main__':
     db.add_group_member("dead.people", "wolfgang")
     db.add_group_member("dead.people", "pafnuty.chebyshev")
     db.add_group_member("dead.people", "agrothendieck")
+
+    res = db.get_groups("%s")
+    assert tuple([r[1] for r in res]) == ('composers', 'mathematicians', 'students')
+
+    res = db.get_accounts("______")
+    assert tuple([r[1] for r in res]) == ('ludwig', 'johann')
+
+    res = db.get_group_members("composers")
+    assert tuple([r[1] for r in res]) == ('ludwig', 'johann', 'wolfgang')
+
 
     db.insert_message(db.get_user_id("tslilyai"),
                       db.get_user_id("fding"),
@@ -263,5 +325,19 @@ if __name__ == '__main__':
     msgs = db.get_messages(db.get_user_id("wolfgang"))
     assert get_contents(msgs) == ('What is heaven like?', 'your music reminded me of quasicoherent sheaves of ideals')
 
+
+    db.edit_group_name('students', 'STUDENTS')
+    db.get_group_id('STUDENTS')
+    try:
+        db.get_group_id("students")
+        raise Exception('DB rename failed')
+    except Exception as e:
+        print 'Caught expected exception %s' % e
+
+    msgs = db.get_messages(db.get_user_id("fding"))
+    assert get_contents(msgs) == ('lets pset',)
+
+    msgs = db.get_messages(db.get_user_id("tslilyai"))
+    assert get_contents(msgs) == ('Hi!', 'lets pset')
 
     print 'Passed all tests'
