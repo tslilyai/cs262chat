@@ -7,14 +7,8 @@ import threading
 
 def thread_safe(fn):
     def new_fn(*args, **kwargs):
-        try:
-            args[0].lock.acquire()
-            ret = fn(*args, **kwargs)
-            args[0].lock.release()
-            return ret
-        except Exception as e:
-            args[0].lock.release()
-            raise e
+        with args[0].lock:
+            return fn(*args, **kwargs)
     return new_fn
 
 class DBManager(object):
