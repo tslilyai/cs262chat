@@ -61,10 +61,10 @@ This interface should be implemented by any protocol used by the chat server.
     def create_group(self, groupname="")
     
     # returns a success or error message string
-    def create_account(self, username=""):
+    def create_account(self, username="")
     
     # returns a success or error message string
-    def remove_account(self, username=""):
+    def remove_account(self, username="")
 
 ###GROUPS 
     
@@ -77,11 +77,20 @@ This interface should be implemented by any protocol used by the chat server.
 
 ### LISTING 
     
-    # returns a list of strings
-    def list_groups(self, pattern="%"):
-    def list_accounts(self, pattern="%"):
-    def list_group_members(self, groupname=""):
+    # returns a list of string
+    def list_groups(self, pattern="%")
+    def list_accounts(self, pattern="%")
+    def list_group_members(self, groupname="")
 
 
 # Database API 
+    def create_tables(self)
+    def insert_message(self, to_id, from_id, msg)
+    def get_user_id(self, uname)
+    def get_group_id(self, gname)
+    def get_messages(self, u_id)
+    def create_group(self, gname)
+    def create_account(self, uname)
+    def add_group_member(self, gname, uname)
+    def remove_account(self, uname)
 
