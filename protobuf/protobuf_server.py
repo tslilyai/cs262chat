@@ -27,15 +27,13 @@ def add_logging(fn):
         return ret
     return fun
 
-def convert_to_protobuf(tpe):
+def list_to_protobuf(tpe):
     def wrap(f):
         def wrapped(*args, **kwargs):
             ret = f(*args, **kwargs)
-            if isinstance(ret, list):
-                for r in ret:
-                    yield tpe(**r)
-            else:
-                return tpe(**ret)
+            assert isinstance(ret, list):
+            for r in ret:
+                yield tpe(**r)
         return wrapped
     return wrap
 
@@ -76,7 +74,7 @@ class ProtobufServer(obj.BetaChatAppServicer):
         return obj.Response(errno=0, msg="success!\n")
 
     @add_logging
-    @convert_to_protobuf(obj.CMessage)
+    @list_to_protobuf(obj.CMessage)
     def rpc_get_messages(self, request, context):
         try:
             u_id = self.db.get_user_id(request.username)
@@ -137,7 +135,7 @@ class ProtobufServer(obj.BetaChatAppServicer):
         return obj.Response(errno=0, msg="success!\n")
 
     @add_logging
-    @convert_to_protobuf(obj.User)
+    @list_to_protobuf(obj.User)
     def rpc_list_group_members(self, request, context):
         try:
             users = self.db.get_group_members(request.g_name)
@@ -146,7 +144,7 @@ class ProtobufServer(obj.BetaChatAppServicer):
         return users
 
     @add_logging
-    @convert_to_protobuf(obj.Group)
+    @list_to_protobuf(obj.Group)
     def rpc_list_groups(self, request, context):
         try:
             groups = self.db.get_groups(request.pattern)
@@ -155,7 +153,7 @@ class ProtobufServer(obj.BetaChatAppServicer):
         return groups
         
     @add_logging
-    @convert_to_protobuf(obj.User)
+    @list_to_protobuf(obj.User)
     def rpc_list_accounts(self, request, context):
         try:
             users = self.db.get_accounts(request.pattern)
