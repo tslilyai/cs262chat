@@ -24,7 +24,6 @@ def list_to_protobuf(tpe):
             print 'Running %s with arguments' % (f.__name__)
             ret = f(*args, **kwargs)
             assert isinstance(ret, list)
-            print ret
             for r in ret:
                 print "Service returned ", str(r)
                 #print tpe(**r)
