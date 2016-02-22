@@ -29,6 +29,9 @@ class DBManager(object):
             CREATE TABLE groups (g_id int NOT NULL PRIMARY KEY, gname varchar(255) UNIQUE)
         """)
         self.c.execute("""
+            CREATE TABLE vgroups (g_id int NOT NULL PRIMARY KEY, id1 int, id2 int)
+        """)
+        self.c.execute("""
             CREATE TABLE user_group_pairs (_id int NOT NULL PRIMARY KEY, u_id int, g_id int)
         """)
         self.c.execute("""
@@ -40,7 +43,25 @@ class DBManager(object):
     def insert_message(self, to_id, from_id, msg):
         if len(msg) > 1023:
             raise Exception('Message string too long')
-        # TODO: check validity of to_id and from_id
+
+        if to_id % 2 == 0:
+            # User id. Look up vgroup
+            self.c.execute("SELECT g_id FROM vgroups WHERE (id1 = ? AND id2 = ?) OR (id2 = ? AND id1 = ?)",
+                          [to_id, from_id, from_id, to_id])
+            v = self.c.fetchone()
+            if v is None:
+                self.c.execute("SELECT g_id FROM vgroups ORDER BY g_id DESC LIMIT 1")
+                v = self.c.fetchone()
+                if v is None:
+                    v = 0
+                else:
+                    v = v[0]
+                self.c.execute("INSERT INTO vgroups (g_id, id1, id2) VALUES (?, ?, ?)", [v + 2, to_id, from_id])
+                self._insert_ugpair(to_id, v+2)
+                self._insert_ugpair(from_id, v+2)
+                to_id = v + 2
+            else:
+                to_id = v[0]
         self.c.execute("""
             SELECT m_id FROM messages ORDER BY m_id DESC LIMIT 1
         """)
@@ -106,6 +127,20 @@ class DBManager(object):
                        """, [v + 2, gname])
         self.conn.commit()
 
+    def _insert_ugpair(self, u_id, g_id):
+        self.c.execute("SELECT _id FROM user_group_pairs ORDER BY _id DESC LIMIT 1")
+        npairs = self.c.fetchone()
+        if npairs is None:
+            npairs = 0
+        else:
+            npairs = npairs[0]
+        self.c.execute("""
+            INSERT INTO user_group_pairs
+                       (_id, u_id, g_id)
+                       VALUES
+                       (?, ?, ?)
+                       """, [npairs + 1, u_id, g_id])
+
     @thread_safe
     def create_account(self, uname):
         self.c.execute("SELECT u_id FROM users ORDER BY u_id DESC LIMIT 1")
@@ -122,18 +157,6 @@ class DBManager(object):
                        (?, ?)
                        """, [v + 2, uname])
 
-        self.c.execute("SELECT _id FROM user_group_pairs ORDER BY _id DESC LIMIT 1")
-        npairs = self.c.fetchone()
-        if npairs is None:
-            npairs = 0
-        else:
-            npairs = npairs[0]
-        self.c.execute("""
-            INSERT INTO user_group_pairs
-                       (_id, u_id, g_id)
-                       VALUES
-                       (?, ?, ?)
-                       """, [npairs + 1, v + 2, v + 2])
         self.conn.commit()
 
     @thread_safe
@@ -158,13 +181,7 @@ class DBManager(object):
         if v is not None and len(v) > 0:
             raise Exception('User already in group')
 
-        self.c.execute("SELECT _id FROM user_group_pairs ORDER BY _id DESC LIMIT 1")
-        npairs = self.c.fetchone()
-        if npairs is None:
-            npairs = 1
-        else:
-            npairs = npairs[0]
-        self.c.execute("INSERT INTO user_group_pairs (_id, u_id, g_id) VALUES (?, ?, ?)", [npairs + 1, u_id, g_id])
+        self._insert_ugpair(u_id, g_id)
         self.conn.commit()
 
 
@@ -308,7 +325,7 @@ if __name__ == '__main__':
         return tuple([l[3] for l in ls])
     # Time to check the messages
     msgs = db.get_messages(db.get_user_id("fding"))
-    assert get_contents(msgs) == ('lets pset',)
+    assert get_contents(msgs) == ('Hi!', 'lets pset',)
 
     msgs = db.get_messages(db.get_user_id("tslilyai"))
     assert get_contents(msgs) == ('Hi!', 'lets pset')
@@ -335,7 +352,7 @@ if __name__ == '__main__':
         print 'Caught expected exception %s' % e
 
     msgs = db.get_messages(db.get_user_id("fding"))
-    assert get_contents(msgs) == ('lets pset',)
+    assert get_contents(msgs) == ('Hi!', 'lets pset',)
 
     msgs = db.get_messages(db.get_user_id("tslilyai"))
     assert get_contents(msgs) == ('Hi!', 'lets pset')
