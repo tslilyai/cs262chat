@@ -8,13 +8,13 @@ import threading
 def thread_safe(fn):
     def new_fn(*args, **kwargs):
         with args[0].lock:
+            args[0].conn = sqlite3.connect('chatapp.db')
+            args[0].c = args[0].conn.cursor()
             return fn(*args, **kwargs)
     return new_fn
 
 class DBManager(object):
     def __init__(self):
-        self.conn = sqlite3.connect('chatapp.db')
-        self.c = self.conn.cursor()
         self.lock = threading.Lock()
 
     def __del__(self):

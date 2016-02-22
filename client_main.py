@@ -27,15 +27,16 @@ Escape thread mode back to command mode simply by typing ESC.
 '''
 
 import sys
-import protocols 
+from protocols import Protocol
 
 def main():
     protocol = sys.argv[1]
     port = sys.argv[2]
-    p = Protocol(p)
+    p = Protocol(protocol)
 
-    p.client_run(username, port)
-
+    p.client_run("fding", port)
+    p.fetch_messages()
+'''
     # do fancy setup stuff here to enter "command mode" and set up UI 
 
     while(1):
@@ -43,3 +44,7 @@ def main():
         
         # poll server for new messages and display on RHS of screen
         p.get_messages(username)
+'''
+
+if __name__ == "__main__":
+    main()

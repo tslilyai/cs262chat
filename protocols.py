@@ -5,14 +5,18 @@ This defines an abstract protocol class that both communication protocols must i
 Front end calls these function (client-side)
 '''
 
+from protobuf.protobuf_wrapper import Protobuf_Protocol
+
 class Protocol(object):
     def __init__(self, protocol):
-        self.P = protocol
+        if protocol == "protobuf":
+            self.P = Protobuf_Protocol()
 
     # RUN
     def client_run(self, username, port):
-        self.P.client_run(username, port)
+        self.P.client_run(username, int(port))
         self.username = username
+        print "client running"
 
     ''' 
     MESSAGING 
@@ -30,10 +34,11 @@ class Protocol(object):
         return self.P.send_group_message(self.username, dest, msg);
     
     # returns a list of (from, msg) string tuples
-    def fetch_messages(self, dest=""):
-        if dest == "":
-            return "please provide a destination username"
-        self.P.fetch_messages(self.username, dest, msg);
+    def fetch_messages(self):
+        msgs = (self.P.fetch_messages())
+        print "fetched messages"
+        for m in msg:
+            print m
 
     '''
     CREATION AND DELETION 
@@ -75,5 +80,8 @@ class Protocol(object):
     # LISTING 
     # returns a list of strings
     def list_groups(self, pattern="%"):
+        self.P.list_groups(pattern)
     def list_accounts(self, pattern="%"):
+        self.P.list_acocunts(pattern)
     def list_group_members(self, groupname=""):
+        self.P.list_group_members(pattern)
