@@ -12,27 +12,28 @@ class Protocol(object):
     # RUN
     def client_run(self, username, port):
         self.P.client_run(username, port)
+        self.username = username
 
     ''' 
     MESSAGING 
     '''
     # returns a success or error message string
-    def send_individual_message(self, src="", dest="", msg=""):
-        if src == "" or dest == "" or msg == "":
+    def send_individual_message(self, dest="", msg=""):
+        if dest == "" or msg == "":
             return "please provide a source username, destination uesrname, and message"
-        return self.P.send_individual_message(src, dest, msg);
+        return self.P.send_individual_message(self.username, dest, msg);
     
     # returns a success or error message string
-    def send_group_message(self, src="", dest="", msg=""):
+    def send_group_message(self, dest="", msg=""):
         if src == "" or dest == "" or msg == "":
-            return "please provide a source username, destination uesrname, and message"
-        return self.P.send_group_message(src, dest, msg);
+            return "please provide a destination username, and message"
+        return self.P.send_group_message(self.username, dest, msg);
     
     # returns a list of (from, msg) string tuples
-    def get_messages(self, dest=""):
+    def fetch_messages(self, dest=""):
         if dest == "":
             return "please provide a destination username"
-        self.P.get_messages(src, dest, msg);
+        self.P.fetch_messages(self.username, dest, msg);
 
     '''
     CREATION AND DELETION 

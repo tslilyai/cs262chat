@@ -14,7 +14,11 @@ We support two types of communication protocols: `protocol` can be one of either
 # Client API 
 The front end will consist of a portion that shows all incoming messages (RHS of console) and a portion that acts as a command-line interface, accepting commands.
 
-The user can also enter "conversation thread mode," which transforms the command-line interface into a chat box with another user or group.
+The client's to-send messages will be put in a client message queue to ensure that messages will be sent one at at time.
+
+A client will continuously poll the server (calling fetch_msgs) every couple of seconds once logged into a user account. This will retrieve the user's unread messages. We track which messages are unread by associating a msg_id with each user that represents the latest message retrieved for the user, and retrieving all messages past that msg_id.
+
+(TODO) The user can also enter "conversation thread mode," which transforms the command-line interface into a chat box with another user or group.
 
 ### Login and Account Creation
 These must be called without being logged in.
