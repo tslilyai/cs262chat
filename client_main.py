@@ -34,7 +34,8 @@ def main():
     port = sys.argv[2]
     p = Protocol(protocol)
 
-    p.client_run("fding", port)
+    p.client_run()
+    p.create_account("hi")
     p.fetch_messages()
 '''
     # do fancy setup stuff here to enter "command mode" and set up UI 

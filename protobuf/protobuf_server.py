@@ -12,17 +12,8 @@ def add_logging(fn):
         print '========================================================='
         print 'Servicing %s with arguments %s' % (fn.__name__, request)
         ret = fn(self, request, context)
-        pval = None
-        if isinstance(ret, types.GeneratorType):
-            pval = []
-            ret, rbackup = itertools.tee(ret)
-            for r in rbackup:
-                print str(r)
-                pval.append(r)
-            pval = ', '.join(pval)
-        else:
-            pval = ret
-        print 'Service returned %s' % pval
+        if not isinstance(ret, types.GeneratorType):
+            print 'Service returned %s' % pval
         print 'Done servicing %s' % fn.__name__
         return ret
     return fun
@@ -30,10 +21,15 @@ def add_logging(fn):
 def list_to_protobuf(tpe):
     def wrap(f):
         def wrapped(*args, **kwargs):
+            print 'Running %s with arguments' % (f.__name__)
             ret = f(*args, **kwargs)
-            assert isinstance(ret, list):
+            assert isinstance(ret, list)
+            print ret
             for r in ret:
-                yield tpe(**r)
+                print "Service returned ", str(r)
+                #print tpe(**r)
+                #print "yielding"
+                #yield tpe(**r)
         return wrapped
     return wrap
 
@@ -81,7 +77,7 @@ class ProtobufServer(obj.BetaChatAppServicer):
             msgs = self.db.get_messages(u_id)
         except Exception as e:
             # return a dummy message if getting messages failed
-            return [{'to_name': 'NULL', 'from_name': 'NULL', 'msg': 'Could not retrieve messages :%s\n' % e}]
+            return [{'msg_id': '0', 'to_name': 'NULL', 'from_name': 'NULL', 'msg': 'Could not retrieve messages :%s\n' % e}]
         return self.db.get_messages(u_id)
 
     @add_logging

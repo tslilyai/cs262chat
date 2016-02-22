@@ -44,7 +44,7 @@ class Protobuf_Protocol(object):
         messages = self.Stub.rpc_get_messages(user, _TIMEOUT_SECONDS)
         for m in messages:
             print "MESSAGE"
-        #return [(m.from_name, m.msg) for m in messages]
+            return [(m.from_name, m.msg) for m in messages]
 
     # CREATION AND DELETION 
     def create_group(self, groupname):
