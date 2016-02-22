@@ -7,12 +7,11 @@ from db import DBManager
 import types
 import itertools
 
-
 def add_logging(fn):
-    def fun(*args, **kwargs):
+    def fun(self, request, context):
         print '========================================================='
-        print 'Servicing %s with arguments %s' % (fn.__name__, ', '.join(map(str, args)))
-        ret = fn(*args, **kwargs)
+        print 'Servicing %s with arguments %s' % (fn.__name__, request)
+        ret = fn(self, request, context)
         pval = None
         if isinstance(ret, types.GeneratorType):
             pval = []
@@ -27,6 +26,18 @@ def add_logging(fn):
         print 'Done servicing %s' % fn.__name__
         return ret
     return fun
+
+def convert_to_protobuf(tpe):
+    def wrap(f):
+        def wrapped(*args, **kwargs):
+            ret = f(*args, **kwargs)
+            if isinstance(ret, list):
+                for r in ret:
+                    yield tpe(**r)
+            else:
+                return tpe(**ret)
+        return wrapped
+    return wrap
 
 def run(port):
     server = obj.beta_create_ChatApp_server(ProtobufServer())
@@ -65,25 +76,15 @@ class ProtobufServer(obj.BetaChatAppServicer):
         return obj.Response(errno=0, msg="success!\n")
 
     @add_logging
+    @convert_to_protobuf(obj.CMessage)
     def rpc_get_messages(self, request, context):
         try:
             u_id = self.db.get_user_id(request.username)
             msgs = self.db.get_messages(u_id)
         except Exception as e:
             # return a dummy message if getting messages failed
-            yield obj.CMessage(
-                    to_name="NULL",
-                    from_name="NULL",
-                    msg="Could not retrieve messages: %s\n" % e
-                )
-            return
-        for msg in self.db.get_messages(u_id):
-            yield obj.CMessage(
-                    m_id=msg[0],
-                    to_name=msg[1],
-                    from_name=msg[2],
-                    msg=msg[3]
-                )
+            return [{'to_name': 'NULL', 'from_name': 'NULL', 'msg': 'Could not retrieve messages :%s\n' % e}]
+        return self.db.get_messages(u_id)
 
     @add_logging
     def rpc_create_group(self, request, context):
@@ -136,31 +137,28 @@ class ProtobufServer(obj.BetaChatAppServicer):
         return obj.Response(errno=0, msg="success!\n")
 
     @add_logging
+    @convert_to_protobuf(obj.User)
     def rpc_list_group_members(self, request, context):
         try:
             users = self.db.get_group_members(request.g_name)
         except Exception as e:
-            yield obj.User(username="NULL")
-            return
-        for user in users:
-            yield user
+            return [{'username': 'NULL'}]
+        return users
 
     @add_logging
+    @convert_to_protobuf(obj.Group)
     def rpc_list_groups(self, request, context):
         try:
             groups = self.db.get_groups(request.pattern)
         except Exception as e:
-            yield obj.Group(g_name="NULL")
-            return
-        for group in groups:
-            yield group
+            return [{'g_name': 'NULL'}]
+        return groups
         
     @add_logging
+    @convert_to_protobuf(obj.User)
     def rpc_list_accounts(self, request, context):
         try:
             users = self.db.get_accounts(request.pattern)
         except Exception as e:
-            yield obj.User(username="NULL")
-            return
-        for user in users:
-            yield user 
+            return [{'username': 'NULL'}]
+        return users
