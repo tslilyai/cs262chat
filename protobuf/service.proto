@@ -1,4 +1,4 @@
-syntax = "proto2";
+syntax = "proto3";
 
 package chatapp;
 
@@ -18,31 +18,31 @@ service ChatApp {
 }
 
 message CMessage {
-    optional int64 m_id = 1;
-    required string to_name = 2;
-    required string from_name = 3;
-    required string msg = 4;
+     int64 m_id = 1;
+     string to_name = 2;
+     string from_name = 3;
+     string msg = 4;
 }
 
 message User {
-    optional int64 u_id = 1;
-    optional string username = 2;
-    optional string password = 3;
+     int64 u_id = 1;
+     string username = 2;
+     string password = 3;
 }
 
 message Group {
-    optional int64 g_id = 1;
-    required string g_name = 2;
+    int64 g_id = 1;
+     string g_name = 2;
     repeated int64 member_ids = 3;
-    optional string edit_member_name = 4;
-    optional string new_name = 5;
+    string edit_member_name = 4;
+     string new_name = 5;
 }
 
 message Response {
-    optional int32 errno = 1;
-    required string msg = 2;
+     int32 errno = 1;
+     string msg = 2;
 }
 
 message Pattern {
-    required string pattern = 1;
+     string pattern = 1;
 }
