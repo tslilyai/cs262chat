@@ -31,7 +31,7 @@ def list_to_protobuf(tpe):
     def wrap(f):
         def wrapped(*args, **kwargs):
             ret = f(*args, **kwargs)
-            assert isinstance(ret, list):
+            assert isinstance(ret, list)
             for r in ret:
                 yield tpe(**r)
         return wrapped
