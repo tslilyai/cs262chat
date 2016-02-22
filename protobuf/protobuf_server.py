@@ -91,7 +91,7 @@ class ProtobufServer(service_pb2.beta_create_ChatApp_server):
         try:
             users = self.db.get_group_members(request.g_name)
         except Exception as e:
-            return obj.User(username="NULL")
+            yield obj.User(username="NULL")
         for user in users:
             yield user
 
@@ -99,7 +99,7 @@ class ProtobufServer(service_pb2.beta_create_ChatApp_server):
         try:
             groups = self.db.get_groups(request.pattern)
         except Exception as e:
-            return obj.Group(g_name="NULL")
+            yield obj.Group(g_name="NULL")
         for group in groups:
             yield group
         
@@ -107,6 +107,6 @@ class ProtobufServer(service_pb2.beta_create_ChatApp_server):
         try:
             users = self.db.get_accounts(request.pattern)
         except Exception as e:
-            return obj.User(username="NULL")
+            yield obj.User(username="NULL")
         for user in users:
             yield user 
