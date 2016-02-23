@@ -34,9 +34,9 @@ def main():
     port = sys.argv[2]
     p = Protocol(protocol)
 
-    p.client_run()
-    p.create_account("testing2")
-    p.fetch_messages()
+    p.client_run("fding")
+    msgs = p.fetch_messages()
+    print 'Received messages', msgs
 '''
     # do fancy setup stuff here to enter "command mode" and set up UI 
 

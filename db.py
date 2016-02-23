@@ -6,137 +6,169 @@ import sqlite3
 import threading
 
 def thread_safe(fn):
-    def new_fn(self, c, *args, **kwargs):
+    def new_fn(self, *args, **kwargs):
         conn = sqlite3.connect('chatapp.db')
         c = conn.cursor()
         try:
-            ret = fn(self, c, *args, **kwargs)
+            ret = fn(self, conn, c, *args, **kwargs)
             conn.close()
             return ret
         except Exception as e:
-			conn.close()
-			raise e
+	    conn.close()
+            print 'Exception occured handling request %s: %s' % (fn.__name__, e)
+	    raise e
     return new_fn
 
 class DBManager(object):
     def __init__(self):
         self.lock = threading.Lock()
 
+    # Note that although this function appears to take conn and c as arguments,
+    # because of the decorator, we don't need to pass these arguments in
     @thread_safe
-    def create_tables(self):
-        self.c.execute("""
+    def create_tables(self, conn, c):
+        c.execute("""
             CREATE TABLE users (u_id int NOT NULL PRIMARY KEY, username varchar(255) UNIQUE)
         """)
-        self.c.execute("""
+        c.execute("""
             CREATE TABLE groups (g_id int NOT NULL PRIMARY KEY, gname varchar(255) UNIQUE)
         """)
-        self.c.execute("""
+        c.execute("""
             CREATE TABLE vgroups (g_id int NOT NULL PRIMARY KEY, id1 int, id2 int)
         """)
-        self.c.execute("""
+        c.execute("""
             CREATE TABLE user_group_pairs (_id int NOT NULL PRIMARY KEY, u_id int, g_id int)
         """)
-        self.c.execute("""
+        c.execute("""
             CREATE TABLE messages (m_id int NOT NULL PRIMARY KEY, to_id int, from_id int, msg varchar(1023))
         """)
-        self.conn.commit()
+        conn.commit()
 
     @thread_safe
-    def insert_message(self, to_id, from_id, msg):
+    def insert_message(self, conn, c, to_id, from_id, msg):
         if len(msg) > 1023:
             raise Exception('Message string too long')
 
         if to_id % 2 == 0:
             # User id. Look up vgroup
-            self.c.execute("SELECT g_id FROM vgroups WHERE (id1 = ? AND id2 = ?) OR (id2 = ? AND id1 = ?)",
+            c.execute("SELECT g_id FROM vgroups WHERE (id1 = ? AND id2 = ?) OR (id2 = ? AND id1 = ?)",
                           [to_id, from_id, from_id, to_id])
-            v = self.c.fetchone()
+            v = c.fetchone()
             if v is None:
-                self.c.execute("SELECT g_id FROM vgroups ORDER BY g_id DESC LIMIT 1")
-                v = self.c.fetchone()
+                c.execute("SELECT g_id FROM vgroups ORDER BY g_id DESC LIMIT 1")
+                v = c.fetchone()
                 if v is None:
                     v = 0
                 else:
                     v = v[0]
-                self.c.execute("INSERT INTO vgroups (g_id, id1, id2) VALUES (?, ?, ?)", [v + 2, to_id, from_id])
-                self._insert_ugpair(to_id, v+2)
-                self._insert_ugpair(from_id, v+2)
+                c.execute("INSERT INTO vgroups (g_id, id1, id2) VALUES (?, ?, ?)", [v + 2, to_id, from_id])
+                self._insert_ugpair(conn, c, to_id, v+2)
+                self._insert_ugpair(conn, c, from_id, v+2)
                 to_id = v + 2
             else:
                 to_id = v[0]
-        self.c.execute("""
+        c.execute("""
             SELECT m_id FROM messages ORDER BY m_id DESC LIMIT 1
         """)
-        v = self.c.fetchone()
+        v = c.fetchone()
         if v is None:
             v = 0
         else:
             v = v[0]
-        self.c.execute("""
+        c.execute("""
             INSERT INTO messages 
                        (m_id, to_id, from_id, msg)
                        VALUES
                        (?, ?, ?, ?)
                        """, [v + 1, to_id, from_id, msg])
-        self.conn.commit()
+        conn.commit()
 
     @thread_safe
-    def get_user_id(self, uname):
-        self.c.execute("SELECT u_id FROM users WHERE username=?", [uname])
-        v = self.c.fetchone()
+    def get_user_id(self, conn, c, uname):
+        c.execute("SELECT u_id FROM users WHERE username=?", [uname])
+        v = c.fetchone()
         if v is None:
             raise Exception('User does not exist')
 
         return v[0]
 
     @thread_safe
-    def get_group_id(self, gname):
-        self.c.execute("SELECT g_id FROM groups WHERE gname=?", [gname])
-        v = self.c.fetchone()
+    def get_group_id(self, conn, c, gname):
+        c.execute("SELECT g_id FROM groups WHERE gname=?", [gname])
+        v = c.fetchone()
         if v is None:
             raise Exception('Group does not exist')
 
         return v[0]
 
     @thread_safe
-    def get_messages(self, u_id):
-        self.c.execute("""
+    def get_messages(self, conn, c, u_id):
+        c.execute("""
             SELECT messages.m_id, messages.to_id, messages.from_id, messages.msg
                 FROM messages INNER JOIN user_group_pairs ON
                     messages.to_id=user_group_pairs.g_id
                 WHERE user_group_pairs.u_id=?
                 ORDER BY messages.m_id ASC
             """, [u_id])
-        v = self.c.fetchall()
-        if v is None:
+        rows = c.fetchall()
+        if rows is None:
             raise Exception('No messages')
-        return v
+        answers = []
+        for row in rows:
+            if row[1] % 2 == 0:
+                c.execute("""
+                    SELECT users.u_id, users.username FROM users
+                        INNER JOIN user_group_pairs ON
+                            user_group_pairs.u_id=users.u_id
+                        WHERE user_group_pairs.g_id=?""", [row[1]])
+                unames = c.fetchall()
+                if unames is None or len(unames) != 2:
+                    raise Exception('To user does not exist')
+                if unames[0][0] == row[2]:
+                    from_name = unames[0][1]
+                    to_name = unames[1][1]
+                else:
+                    from_name = unames[1][1]
+                    to_name = unames[0][1]
+            else:
+                c.execute("SELECT gname FROM groups WHERE g_id=?", [row[1]])
+                group = c.fetchone()
+                if group is None:
+                    raise Exception('To group does not exist')
+                to_name = group[0]
+                c.execute("SELECT username FROM users WHERE u_id=?", [row[2]])
+                user = c.fetchone()
+                if user is None:
+                    raise Exception('To group does not exist')
+                from_name = user[0]
+            answers.append({'m_id': row[0], 'to_name': to_name, 'from_name': from_name, 'msg': row[3]})
+        return answers
 
     @thread_safe
-    def create_group(self, gname):
-        self.c.execute("SELECT g_id FROM groups ORDER BY g_id DESC LIMIT 1")
-        v = self.c.fetchone()
+    def create_group(self, conn, c, gname):
+        c.execute("SELECT g_id FROM groups ORDER BY g_id DESC LIMIT 1")
+        v = c.fetchone()
         if v is None:
             v = 1
         else:
             v = v[0]
         assert (v % 2 == 1)
-        self.c.execute("""
+        c.execute("""
             INSERT INTO groups 
                        (g_id, gname)
                        VALUES
                        (?, ?)
                        """, [v + 2, gname])
-        self.conn.commit()
+        conn.commit()
 
-    def _insert_ugpair(self, u_id, g_id):
-        self.c.execute("SELECT _id FROM user_group_pairs ORDER BY _id DESC LIMIT 1")
-        npairs = self.c.fetchone()
+    def _insert_ugpair(self, conn, c, u_id, g_id):
+        c.execute("SELECT _id FROM user_group_pairs ORDER BY _id DESC LIMIT 1")
+        npairs = c.fetchone()
         if npairs is None:
             npairs = 0
         else:
             npairs = npairs[0]
-        self.c.execute("""
+        c.execute("""
             INSERT INTO user_group_pairs
                        (_id, u_id, g_id)
                        VALUES
@@ -144,17 +176,17 @@ class DBManager(object):
                        """, [npairs + 1, u_id, g_id])
 
     @thread_safe
-    def create_account(self, uname):
+    def create_account(self, conn, c, uname):
         print "selecting"
-        self.c.execute("SELECT u_id FROM users ORDER BY u_id DESC LIMIT 1")
-        v = self.c.fetchone()
+        c.execute("SELECT u_id FROM users ORDER BY u_id DESC LIMIT 1")
+        v = c.fetchone()
         if v is None:
             v = 0
         else:
             v = v[0]
         assert (v % 2 == 0)
         print "about to insert"
-        self.c.execute("""
+        c.execute("""
             INSERT INTO users 
                        (u_id, username)
                        VALUES
@@ -162,99 +194,99 @@ class DBManager(object):
                        """, [v + 2, uname])
 
         print "done creating account"
-        self.conn.commit()
+        conn.commit()
         print "committed"
 
     @thread_safe
-    def add_group_member(self, gname, uname):
-        self.c.execute("SELECT u_id FROM users WHERE username=?", [uname])
-        u_id = self.c.fetchone()
+    def add_group_member(self, conn, c, gname, uname):
+        c.execute("SELECT u_id FROM users WHERE username=?", [uname])
+        u_id = c.fetchone()
         if u_id is None:
             raise Exception('User does not exist')
         else:
             u_id = u_id[0]
 
-        self.c.execute("SELECT g_id FROM groups WHERE gname=?", [gname])
-        g_id = self.c.fetchone()
+        c.execute("SELECT g_id FROM groups WHERE gname=?", [gname])
+        g_id = c.fetchone()
         if g_id is None:
             raise Exception('Group does not exist')
         else:
             g_id = g_id[0]
 
-        self.c.execute("SELECT _id FROM user_group_pairs WHERE u_id=? AND g_id=?",
+        c.execute("SELECT _id FROM user_group_pairs WHERE u_id=? AND g_id=?",
                        [u_id, g_id])
-        v = self.c.fetchone()
+        v = c.fetchone()
         if v is not None and len(v) > 0:
             raise Exception('User already in group')
 
-        self._insert_ugpair(u_id, g_id)
-        self.conn.commit()
+        self._insert_ugpair(conn, c, u_id, g_id)
+        conn.commit()
 
 
     @thread_safe
-    def remove_account(self, uname):
-        self.c.execute("SELECT u_id FROM users WHERE username=?", [uname])
-        v = self.c.fetchone()
+    def remove_account(self, conn, c, uname):
+        c.execute("SELECT u_id FROM users WHERE username=?", [uname])
+        v = c.fetchone()
         if v is None:
             raise Exception("Deleted user doesn't exit")
         else:
             v = v[0]
 
-        self.c.execute("DELETE FROM users WHERE u_id=?", [v])
-        self.c.execute("DELETE FROM user_group_pairs WHERE u_id=?", [v])
-        self.conn.commit()
+        c.execute("DELETE FROM users WHERE u_id=?", [v])
+        c.execute("DELETE FROM user_group_pairs WHERE u_id=?", [v])
+        conn.commit()
 
     @thread_safe
-    def remove_group_member(self, gname, uname):
-        self.c.execute("SELECT u_id FROM users WHERE username=?", [uname])
-        uid = self.c.fetchone()
+    def remove_group_member(self, conn, c, gname, uname):
+        c.execute("SELECT u_id FROM users WHERE username=?", [uname])
+        uid = c.fetchone()
         if uid is None:
             raise Exception("User doesn't exist")
         else:
             uid = uid[0]
 
-        self.c.execute("SELECT g_id FROM groups WHERE gname=?", [gname])
-        gid = self.c.fetchone()
+        c.execute("SELECT g_id FROM groups WHERE gname=?", [gname])
+        gid = c.fetchone()
         if gid is None:
             raise Exception("Group doesn't exist")
         else:
             gid = gid[0]
 
-        self.c.execute("DELETE FROM user_group_pairs WHERE u_id=? AND g_id=?", [uid, gid])
-        self.conn.commit()
+        c.execute("DELETE FROM user_group_pairs WHERE u_id=? AND g_id=?", [uid, gid])
+        conn.commit()
 
     @thread_safe
-    def edit_group_name(self, gname, newname):
-        self.c.execute("UPDATE groups SET gname=? WHERE gname=?", [newname, gname])
-        self.conn.commit()
+    def edit_group_name(self, conn, c, gname, newname):
+        c.execute("UPDATE groups SET gname=? WHERE gname=?", [newname, gname])
+        conn.commit()
 
     @thread_safe
-    def get_groups(self, pattern):
-        self.c.execute("SELECT g_id, gname FROM groups WHERE gname LIKE ?", [pattern])
-        v = self.c.fetchall()
-        if v is None:
+    def get_groups(self, conn, c, pattern):
+        c.execute("SELECT g_id, gname FROM groups WHERE gname LIKE ?", [pattern])
+        groups = c.fetchall()
+        if groups is None:
             return []
-        return v
+        return [{'g_id': g[0], 'gname': g[1]} for g in groups]
 
     @thread_safe
-    def get_accounts(self, pattern):
-        self.c.execute("SELECT u_id, username FROM users WHERE username LIKE ? ORDER BY u_id ASC", [pattern])
-        v = self.c.fetchall()
-        if v is None:
+    def get_accounts(self, conn, c, pattern):
+        c.execute("SELECT u_id, username FROM users WHERE username LIKE ? ORDER BY u_id ASC", [pattern])
+        users = c.fetchall()
+        if users is None:
             return []
-        return v
+        return [{'u_id': u[0], 'username': u[1]} for u in users]
 
     @thread_safe
-    def get_group_members(self, gname):
-        self.c.execute("""
+    def get_group_members(self, conn, c, gname):
+        c.execute("""
             SELECT users.u_id, users.username FROM
                 users INNER JOIN user_group_pairs ON users.u_id=user_group_pairs.u_id
                 INNER JOIN groups ON user_group_pairs.g_id=groups.g_id
                 WHERE groups.gname=?""", [gname])
-        v = self.c.fetchall()
-        if v is None:
+        users = c.fetchall()
+        if users is None:
             return []
-        return v
+        return [{'u_id': u[0], 'username': u[1]} for u in users]
 
 if __name__ == '__main__':
     db = DBManager()
@@ -298,13 +330,13 @@ if __name__ == '__main__':
     db.add_group_member("dead.people", "agrothendieck")
 
     res = db.get_groups("%s")
-    assert tuple([r[1] for r in res]) == ('composers', 'mathematicians', 'students')
+    assert tuple([r['gname'] for r in res]) == ('composers', 'mathematicians', 'students')
 
     res = db.get_accounts("______")
-    assert tuple([r[1] for r in res]) == ('ludwig', 'johann')
+    assert tuple([r['username'] for r in res]) == ('ludwig', 'johann')
 
     res = db.get_group_members("composers")
-    assert tuple([r[1] for r in res]) == ('ludwig', 'johann', 'wolfgang')
+    assert tuple([r['username'] for r in res]) == ('ludwig', 'johann', 'wolfgang')
 
 
     db.insert_message(db.get_user_id("tslilyai"),
@@ -328,7 +360,7 @@ if __name__ == '__main__':
                       "your music reminded me of quasicoherent sheaves of ideals")
 
     def get_contents(ls):
-        return tuple([l[3] for l in ls])
+        return tuple([l['msg'] for l in ls])
     # Time to check the messages
     msgs = db.get_messages(db.get_user_id("fding"))
     assert get_contents(msgs) == ('Hi!', 'lets pset',)

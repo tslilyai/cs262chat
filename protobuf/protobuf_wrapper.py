@@ -10,7 +10,7 @@ _TIMEOUT_SECONDS = 30
 
 class Protobuf_Protocol(object):
 
-    def __get_response(response):
+    def __get_response(self, response):
         if response.errno:
             return "Error: " + response.msg
         else: 
@@ -42,9 +42,7 @@ class Protobuf_Protocol(object):
             username = self.Username
         )
         messages = self.Stub.rpc_get_messages(user, _TIMEOUT_SECONDS)
-        for m in messages:
-            print "MESSAGE"
-            return [(m.from_name, m.msg) for m in messages]
+        return [(m.from_name, m.msg) for m in messages]
 
     # CREATION AND DELETION 
     def create_group(self, groupname):

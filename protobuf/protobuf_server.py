@@ -19,15 +19,16 @@ def add_logging(fn):
 
 def list_to_protobuf(tpe):
     def wrap(f):
-        def wrapped(*args, **kwargs):
-            print 'Running %s with arguments' % (f.__name__)
-            ret = f(*args, **kwargs)
+        def wrapped(self, request, context, *args, **kwargs):
+            print 'Running %s with arguments %s' % (f.__name__, request)
+            ret = f(self, request, context, *args, **kwargs)
             assert isinstance(ret, list)
             for r in ret:
-                print "Service returned ", str(r)
-                #print tpe(**r)
-                #print "yielding"
-                #yield tpe(**r)
+                print "Yielding service returned ", str(r)
+                print tpe
+                print 'Tpe %s' % tpe(**r)
+                yield tpe(**r)
+        wrapped.__name__ = f.__name__
         return wrapped
     return wrap
 
@@ -75,8 +76,8 @@ class ProtobufServer(obj.BetaChatAppServicer):
             msgs = self.db.get_messages(u_id)
         except Exception as e:
             # return a dummy message if getting messages failed
-            return [{'msg_id': '0', 'to_name': 'NULL', 'from_name': 'NULL', 'msg': 'Could not retrieve messages :%s\n' % e}]
-        return self.db.get_messages(u_id)
+            return [{'m_id': 0, 'to_name': 'NULL', 'from_name': 'NULL', 'msg': 'Could not retrieve messages :%s\n' % e}]
+        return msgs
 
     @add_logging
     def rpc_create_group(self, request, context):
@@ -96,9 +97,8 @@ class ProtobufServer(obj.BetaChatAppServicer):
             self.db.create_account(username)
             print "created account!"
         except Exception as e:
-            return obj.Response(errno=1, msg=e)
-        return obj.Response()
-        #return obj.Response(errno=0, msg="success!\n")
+            return obj.Response(errno=1, msg=str(e))
+        return obj.Response(errno=0, msg="success!\n")
 
     @add_logging
     def rpc_remove_account(self, request, context):

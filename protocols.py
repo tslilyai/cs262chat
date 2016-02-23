@@ -41,10 +41,7 @@ class Protocol(object):
     def fetch_messages(self):
         if self.username == "":
             return "please login as a user or create a user account"
-        msgs = (self.P.fetch_messages())
-        print "fetched messages"
-        for m in msg:
-            print m
+        return self.P.fetch_messages()
 
     '''
     CREATION AND DELETION 
