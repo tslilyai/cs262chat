@@ -35,7 +35,7 @@ def main():
     p = Protocol(protocol)
 
     p.client_run()
-    p.create_account("hi")
+    p.create_account("testing2")
     p.fetch_messages()
 '''
     # do fancy setup stuff here to enter "command mode" and set up UI 

@@ -6,19 +6,21 @@ import sqlite3
 import threading
 
 def thread_safe(fn):
-    def new_fn(*args, **kwargs):
-        with args[0].lock:
-            args[0].conn = sqlite3.connect('chatapp.db')
-            args[0].c = args[0].conn.cursor()
-            return fn(*args, **kwargs)
+    def new_fn(self, c, *args, **kwargs):
+        conn = sqlite3.connect('chatapp.db')
+        c = conn.cursor()
+        try:
+            ret = fn(self, c, *args, **kwargs)
+            conn.close()
+            return ret
+        except Exception as e:
+			conn.close()
+			raise e
     return new_fn
 
 class DBManager(object):
     def __init__(self):
         self.lock = threading.Lock()
-
-    def __del__(self):
-        self.conn.close()
 
     @thread_safe
     def create_tables(self):
@@ -143,6 +145,7 @@ class DBManager(object):
 
     @thread_safe
     def create_account(self, uname):
+        print "selecting"
         self.c.execute("SELECT u_id FROM users ORDER BY u_id DESC LIMIT 1")
         v = self.c.fetchone()
         if v is None:
@@ -150,6 +153,7 @@ class DBManager(object):
         else:
             v = v[0]
         assert (v % 2 == 0)
+        print "about to insert"
         self.c.execute("""
             INSERT INTO users 
                        (u_id, username)
@@ -157,7 +161,9 @@ class DBManager(object):
                        (?, ?)
                        """, [v + 2, uname])
 
+        print "done creating account"
         self.conn.commit()
+        print "committed"
 
     @thread_safe
     def add_group_member(self, gname, uname):

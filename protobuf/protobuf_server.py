@@ -12,8 +12,7 @@ def add_logging(fn):
         print '========================================================='
         print 'Servicing %s with arguments %s' % (fn.__name__, request)
         ret = fn(self, request, context)
-        if not isinstance(ret, types.GeneratorType):
-            print 'Service returned %s' % pval
+        print 'Service returned %s' % ret
         print 'Done servicing %s' % fn.__name__
         return ret
     return fun
@@ -91,11 +90,15 @@ class ProtobufServer(obj.BetaChatAppServicer):
     @add_logging
     def rpc_create_account(self, request, context):
         username = request.username
+        print "username is %s" % username
         try:
+            print "creating account..."
             self.db.create_account(username)
+            print "created account!"
         except Exception as e:
             return obj.Response(errno=1, msg=e)
-        return obj.Response(errno=0, msg="success!\n")
+        return obj.Response()
+        #return obj.Response(errno=0, msg="success!\n")
 
     @add_logging
     def rpc_remove_account(self, request, context):

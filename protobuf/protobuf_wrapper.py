@@ -52,7 +52,9 @@ class Protobuf_Protocol(object):
         return self.__get_response(self.Stub.rpc_create_group(group, _TIMEOUT_SECONDS))
     def create_account(self, username):
         user = obj.User(username=username)
-        return self.__get_response(self.Stub.rpc_create_account(user, _TIMEOUT_SECONDS))
+        response = self.Stub.rpc_create_account(user, _TIMEOUT_SECONDS)
+        print response.msg
+        return self.__get_response(response)
     def remove_account(self):
         user = obj.User(username=username)
         return self.__get_response(self.Stub.rpc_remove_account(user, _TIMEOUT_SECONDS))
