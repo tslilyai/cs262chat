@@ -40,7 +40,7 @@ class Protocol(object):
     # returns a list of (from, msg) string tuples
     def fetch_messages(self):
         if self.username == "":
-            return "please login as a user or create a user account"
+            return [(None, "please login as a user or create a user account")]
         return self.P.fetch_messages()
 
     '''

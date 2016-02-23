@@ -27,16 +27,37 @@ Escape thread mode back to command mode simply by typing ESC.
 '''
 
 import sys
+import thread
+import time
 from protocols import Protocol
+
+def poll_for_messages(p, delay):
+    try:
+        while(1):
+            time.sleep(delay)
+            msgs = p.fetch_messages()
+            # not logged in yet, just keep looping 
+            if msgs[0][0] == None:
+                # print on screen "not logged in, no messages"
+                continue
+            else:
+                print 'Received messages', msgs
+    except KeyboardInterrupt:
+        exit(0)
 
 def main():
     protocol = sys.argv[1]
     port = sys.argv[2]
     p = Protocol(protocol)
 
-    p.client_run("fding")
-    msgs = p.fetch_messages()
-    print 'Received messages', msgs
+    try:
+        p.client_run("fding")
+        thread.start_new_thread(poll_for_messages, (p, 1,))
+    except KeyboardInterrupt:
+        exit(0)
+    except Exception as e:
+        print "Unable to start thread to get messages: %s" % e
+
 '''
     # do fancy setup stuff here to enter "command mode" and set up UI 
 
