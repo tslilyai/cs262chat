@@ -7,7 +7,6 @@ from display import DisplayScreen
 class Window:
     DOWN = 1
     UP = -1
-    SPACE_KEY = 32
     ESC_KEY = 27
 
     screen = None
@@ -23,7 +22,7 @@ class Window:
         display_window = curses.newwin(height - 10, width, 1, 1)
         input_window = curses.newwin(5, width, height-10, 1)
         self.display = DisplayScreen(display_window)
-        #self.input_w = InputWindow(input_window)
+        self.input_w = InputWindow(input_window)
         self.run()
         
     def run(self):
@@ -38,16 +37,21 @@ class Window:
                     self.display.updown(self.DOWN)
                 elif c == self.ESC_KEY:
                     self.exit()
+                elif c == "\n":
+                    self.flush_screen()
                 else:
-                    #type into input window
-                    pass
+                    self.input_w.putchar(c)
             except Exception as e:
                 with open ("log.txt", "a") as f:
                     f.write("CRASHED %s\n" % e)
 
+    def flush_screen(self):
+        self.display.addOutputLine(self.input_w.line)
+        self.input_w.clearLine()
 
     def displayScreen(self):
         self.display.displayScreen()
+        self.input_w.displayScreen()
 
     def restoreScreen(self):
         curses.initscr()
@@ -58,7 +62,3 @@ class Window:
     # catch any weird termination situations
     def __del__(self):
         self.restoreScreen()
-
-if __name__ == '__main__':
-    ih = Window()
-
