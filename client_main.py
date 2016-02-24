@@ -30,8 +30,13 @@ import sys
 import thread
 import time
 from protocols import Protocol
+from collections import defaultdict
+
+def display_messages():
+
 
 def poll_for_messages(p, delay):
+    messages = defaultdict(list)
     try:
         while(1):
             time.sleep(delay)
@@ -41,7 +46,8 @@ def poll_for_messages(p, delay):
                 # print on screen "not logged in, no messages"
                 continue
             else:
-                print 'Received messages', msgs
+                for m in msgs:
+                    messages[m.from_id].append(m)
     except KeyboardInterrupt:
         exit(0)
 
@@ -51,7 +57,7 @@ def main():
     p = Protocol(protocol)
 
     try:
-        p.client_run("fding")
+        p.client_run()
         thread.start_new_thread(poll_for_messages, (p, 1,))
     except KeyboardInterrupt:
         exit(0)
