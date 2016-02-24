@@ -10,10 +10,6 @@ class InputWindow:
     def __init__(self, window):
         self.screen = window
         self.screen.border(0)
-        self.topLineNum = 0
-        self.highlightLineNum = 0
-        self.markedLineNums = []
-        self.getOutputLines()        
         
     def putchar(self, c):
         line += c

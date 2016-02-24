@@ -3,6 +3,7 @@ import sys
 import random
 import time
 from display import DisplayScreen
+from inputw import InputWindow
 
 class Window:
     DOWN = 1
@@ -62,3 +63,9 @@ class Window:
     # catch any weird termination situations
     def __del__(self):
         self.restoreScreen()
+
+def main(arg):
+    ih = Window()
+
+if __name__ == "__main__":
+    curses.wrapper(main)
