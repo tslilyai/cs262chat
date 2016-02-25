@@ -87,13 +87,3 @@ class DisplayScreen:
             self.highlightLineNum = nextLineNum
         elif increment == self.DOWN and (self.topLineNum+self.highlightLineNum+1) != self.nOutputLines and self.highlightLineNum != curses.LINES:
             self.highlightLineNum = nextLineNum
-   
-    def restoreScreen(self):
-        curses.initscr()
-        curses.nocbreak()
-        curses.echo()
-        curses.endwin()
- 
-    # catch any weird termination situations
-    def __del__(self):
-        self.restoreScreen()

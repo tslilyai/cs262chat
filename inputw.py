@@ -21,13 +21,3 @@ class InputWindow:
         # clear screen
         self.screen.erase()
         self.screen.addstr(0, 0, line)
-
-    def restoreScreen(self):
-        curses.initscr()
-        curses.nocbreak()
-        curses.echo()
-        curses.endwin()
-    
-    # catch any weird termination situations
-    def __del__(self):
-        self.restoreScreen()

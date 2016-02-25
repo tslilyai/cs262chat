@@ -12,8 +12,8 @@ class Window:
 
     screen = None
             
-    def __init__(self):
-        self.screen = curses.initscr()
+    def __init__(self, screen):
+        self.screen = screen
         curses.noecho()
         curses.cbreak()
         self.screen.keypad(1) 
@@ -28,6 +28,7 @@ class Window:
         
     def run(self):
         while True:
+            assert not curses.isendwin()
             try:
                 self.display.displayScreen()
                 # get user command
@@ -54,18 +55,8 @@ class Window:
         self.display.displayScreen()
         self.input_w.displayScreen()
 
-    def restoreScreen(self):
-        curses.initscr()
-        curses.nocbreak()
-        curses.echo()
-        curses.endwin()
-    
-    # catch any weird termination situations
-    def __del__(self):
-        self.restoreScreen()
-
-def main(arg):
-    ih = Window()
+def main(screen):
+    ih = Window(screen)
 
 if __name__ == "__main__":
     curses.wrapper(main)
