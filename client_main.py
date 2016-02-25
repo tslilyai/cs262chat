@@ -17,7 +17,7 @@ Command Mode: These cannot be called without being logged in
     > ls-group-members [name] [pattern (optional)]
     > mk-group [name] [users]
     > send-msg [dest-name] [message]
-    > fetch-msgs
+    > fetch-msgs [group_id]
     > logout
 
 Conversation Thread Mode
@@ -33,16 +33,15 @@ import thread
 import time
 from protocols import Protocol
 from collections import defaultdict
+from window import CmdWindow
+#from convo_mode import ConvoWindow
 
-def display_messages():
-
-
-def poll_for_messages(p, delay):
+def poll_for_messages(group_id, p, delay):
     messages = defaultdict(list)
     try:
         while(1):
             time.sleep(delay)
-            msgs = p.fetch_messages()
+            msgs = p.fetch_messages(group_id)
             # not logged in yet, just keep looping 
             if msgs[0][0] == None:
                 # print on screen "not logged in, no messages"
@@ -53,32 +52,23 @@ def poll_for_messages(p, delay):
     except KeyboardInterrupt:
         exit(0)
 
-def get_input():
-    tp = curses.textpad.Textbox(xin)
-
-def main():
+def main(screen):
     protocol = sys.argv[1]
     port = sys.argv[2]
     p = Protocol(protocol)
+    
+    cmd_window = CmdWindow(screen, p)
+#    conversation_window = ConvoWindow(screen, p)
 
     try:
         p.client_run()
-        thread.start_new_thread(poll_for_messages, (p, 1,))
-
+        while(1):
+            group_id = cmd_window.run()
+            conversation_window.enter_convo_mode(group_or_user_id)
     except KeyboardInterrupt:
         exit(0)
     except Exception as e:
-        print "Unable to start thread to get messages: %s" % e
-
-'''
-    # do fancy setup stuff here to enter "command mode" and set up UI 
-
-    while(1):
-        # read from console, run cmd (using p) and handle output appropriately
-        
-        # poll server for new messages and display on RHS of screen
-        p.get_messages(username)
-'''
+        print "Error running client: %s" % e
 
 if __name__ == "__main__":
-    main()
+    curses.wrapper(main)

@@ -17,26 +17,19 @@ class Protobuf_Protocol(object):
             return response.msg
 
     # RUN
-    def client_run(self, username, port):
+    def client_run(self, port):
         self.Channel = implementations.insecure_channel('localhost', port)
         self.Stub = obj.beta_create_ChatApp_stub(self.Channel)
-        self.Username = username
+        self.Username = "" 
 
     # MESSAGING 
-    def send_individual_message(self, src, dest, msg):
+    def send_message(self, dest, msg):
         message = obj.CMessage(
-            to_name = dest,
+            to_id = dest,
             from_name = src,
             msg = msg
         )
         return self.__get_response(self.Stub.rpc_send_individual_message(message, _TIMEOUT_SECONDS))
-    def send_group_message(self, src, dest, msg):
-        message = obj.CMessage(
-            to_name = dest,
-            from_name = src,
-            msg = msg
-        )
-        return self.__get_response(self.Stub.rpc_send_group_message(message, _TIMEOUT_SECONDS))
     def fetch_messages(self):
         user = obj.User(
             username = self.Username
@@ -72,14 +65,14 @@ class Protobuf_Protocol(object):
     def list_groups(self, pattern):
         pattern = obj.Pattern(pattern=pattern) 
         groups = self.Stub.rpc_list_groups(pattern, _TIMEOUT_SECONDS)
-        return [g.g_name for g in groups]
+        return [(g.g_name, g.g_id) for g in groups]
     def list_accounts(self, pattern):
         pattern = obj.Pattern(pattern=pattern) 
         users = self.Stub.rpc_list_users(pattern, _TIMEOUT_SECONDS)
-        return [u.username for u in users]
+        return [(u.username, u.u_id) for u in users]
     def list_group_members(self, groupname):
         group = obj.Group(
             g_name=groupname
         )
         users = self.Stub.rpc_list_group_members(group, _TIMEOUT_SECONDS)
-        return [u.username for u in users]
+        return [(u.username, u.u_id) for u in users]

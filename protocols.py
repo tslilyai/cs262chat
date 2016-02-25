@@ -13,35 +13,29 @@ class Protocol(object):
             self.P = Protobuf_Protocol()
 
     # RUN
-    def client_run(self, username="", port="8080"):
-        self.P.client_run(username, int(port))
-        self.username = username
+    def client_run(self, port="8080"):
+        self.P.client_run(int(port))
+        self.username = "" 
         print "client running"
 
     ''' 
     MESSAGING 
     '''
     # returns a success or error message string
-    def send_individual_message(self, dest="", msg=""):
+    def send_message(self, dest_id=-1, msg=""):
         if username == "":
             return "please login as a user or create a user account"
-        if dest == "" or msg == "":
-            return "please provide a source username, destination uesrname, and message"
-        return self.P.send_individual_message(self.username, dest, msg);
-    
-    # returns a success or error message string
-    def send_group_message(self, dest="", msg=""):
-        if self.username == "":
-            return "please login as a user or create a user account"
-        if src == "" or dest == "" or msg == "":
-            return "please provide a destination username, and message"
-        return self.P.send_group_message(self.username, dest, msg);
+        if dest_id == -1 or msg == "":
+            return "please provide a destination id, and message"
+        return self.P.send_individual_message(self.username, dest_id, msg);
     
     # returns a list of (from, msg) string tuples
-    def fetch_messages(self):
+    def fetch_messages(self, dest_id=-1):
         if self.username == "":
             return [(None, "please login as a user or create a user account")]
-        return self.P.fetch_messages()
+        if dest_id == -1: 
+            return "please provide a destination id"
+        return self.P.fetch_messages(dest_id)
 
     '''
     CREATION AND DELETION 
@@ -98,10 +92,10 @@ class Protocol(object):
             return "please provide a group name and member name"
 
     # LISTING 
-    # returns a list of strings
+    # returns a list of tuples (name, id)
     def list_groups(self, pattern="%"):
         self.P.list_groups(pattern)
     def list_accounts(self, pattern="%"):
-        self.P.list_acocunts(pattern)
+        self.P.list_accounts(pattern)
     def list_group_members(self, groupname=""):
-        self.P.list_group_members(pattern)
+        self.P.list_group_members(groupname)
