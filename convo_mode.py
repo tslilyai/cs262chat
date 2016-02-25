@@ -30,7 +30,7 @@ class ConvoWindow(Window):
         self.group_id = None
         thread.start_new_thread(poll_for_messages, (p, 1, self))
 
-    def enter_convo_mode(self, group_id, to_name, tpe):
+    def enter_convo_mode(self, group_id, tpe):
         self.group_id = group_id
         self.to_name = to_name
         self.tpe = tpe

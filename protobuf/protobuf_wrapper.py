@@ -12,9 +12,9 @@ class Protobuf_Protocol(object):
 
     def __get_response(self, response):
         if response.errno:
-            return "Error: " + response.msg
+            return False, "Error: " + response.msg
         else: 
-            return response.msg
+            return True, response.msg
 
     # RUN
     def client_run(self, username, port):
