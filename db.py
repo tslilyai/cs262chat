@@ -141,7 +141,7 @@ class DBManager(object):
                 if user is None:
                     raise Exception('To group does not exist')
                 from_name = user[0]
-            answers.append({'m_id': row[0], 'to_name': to_name, 'from_name': from_name, 'msg': row[3]})
+            answers.append({'m_id': row[0], 'to_name': to_name, 'from_name': from_name, 'msg': row[3], 'group_id': row[1]})
         return answers
 
     @thread_safe

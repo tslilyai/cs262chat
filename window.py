@@ -4,8 +4,9 @@ import random
 import time
 from display import DisplayScreen
 from inputw import InputWindow
+import os
 
-class Window():
+class Window(object):
     DOWN = 1
     UP = -1
     ESC_KEY = 27
@@ -138,12 +139,14 @@ class CmdWindow(Window):
                 self.displayScreen()
                 # get user command
                 c = self.screen.getch()
+                with open ("log.txt", "a") as f:
+                    f.write("Read %d\n" % c)
                 if c == curses.KEY_UP: 
                     self.display.updown(self.UP)
                 elif c == curses.KEY_DOWN:
                     self.display.updown(self.DOWN)
                 elif c == self.ESC_KEY:
-                    self.exit()
+                    sys.exit()
                 elif c == ord('\n'):
                     ret = self.execute_cmd()
                     if ret != "":
@@ -154,3 +157,11 @@ class CmdWindow(Window):
             except Exception as e:
                 with open ("log.txt", "a") as f:
                     f.write("CRASHED %s\n" % e)
+
+    def flush_screen(self):
+        self.display.addOutputLine(self.input_w.line)
+        self.input_w.clearLine()
+
+    def displayScreen(self):
+        self.display.displayScreen()
+        self.input_w.displayScreen()

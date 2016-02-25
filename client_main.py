@@ -71,4 +71,5 @@ def main(screen):
         print "Error running client: %s" % e
 
 if __name__ == "__main__":
+    os.environ.setdefault('ESCDELAY', '25')
     curses.wrapper(main)
