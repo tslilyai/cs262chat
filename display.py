@@ -48,6 +48,8 @@ class DisplayScreen:
     def addOutputLine(self, line):
         self.outputLines.append(line)
         self.nOutputLines+=1
+        if self.nOutputLines >= self.screen.getmaxyx()[0]:
+            self.topLineNum+=1
         self.displayScreen()
 
     def displayScreen(self):
@@ -70,9 +72,6 @@ class DisplayScreen:
     # move highlight up/down one line
     def updown(self, increment):
         nextLineNum = self.highlightLineNum + increment
-        with open ("log.txt", "a") as f:
-            f.write("running updown")
-
         # paging
         if increment == self.UP and self.highlightLineNum == 0 and self.topLineNum != 0:
             self.topLineNum += self.UP 
