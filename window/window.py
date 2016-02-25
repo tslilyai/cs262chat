@@ -2,8 +2,8 @@ import curses
 import sys
 import random
 import time
-from window.display import DisplayScreen
-from window.inputw import InputWindow
+from display import DisplayScreen
+from inputw import InputWindow
 import os
 
 class Window(object):

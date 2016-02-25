@@ -27,6 +27,7 @@ Escape thread mode back to command mode simply by typing ESC.
 '''
 
 import sys
+import os
 import curses
 import curses.textpad
 import thread

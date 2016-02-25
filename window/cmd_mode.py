@@ -2,9 +2,9 @@ import curses
 import sys
 import random
 import time
-from window.window import Window
-from window.display import DisplayScreen
-from window.inputw import InputWindow
+from window import Window
+from display import DisplayScreen
+from inputw import InputWindow
 import os
 
 class CmdWindow(Window):
