@@ -17,7 +17,7 @@ Command Mode: These cannot be called without being logged in
     > ls-group-members [name] [pattern (optional)]
     > mk-group [name] [users]
     > send-msg [dest-name] [message]
-    > fetch-msgs [group_id]
+    > fetch-msgs [id]
     > logout
 
 Conversation Thread Mode

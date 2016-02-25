@@ -157,11 +157,3 @@ class CmdWindow(Window):
             except Exception as e:
                 with open ("log.txt", "a") as f:
                     f.write("CRASHED %s\n" % e)
-
-    def flush_screen(self):
-        self.display.addOutputLine(self.input_w.line)
-        self.input_w.clearLine()
-
-    def displayScreen(self):
-        self.display.displayScreen()
-        self.input_w.displayScreen()
