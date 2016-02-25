@@ -26,6 +26,7 @@ class DisplayScreen:
         self.markedLineNums = []
         self.getOutputLines()        
 
+        '''
         # thread that just adds lines
         def add_lines(v):
             i=0
@@ -40,6 +41,7 @@ class DisplayScreen:
                         f.write("CRASHED %s\n" % e)
                 time.sleep(.1)
         thread.start_new_thread(add_lines, ("this is a line\n",))
+        '''
 
         
     def getOutputLines(self):

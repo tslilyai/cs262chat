@@ -6,7 +6,7 @@ from display import DisplayScreen
 from inputw import InputWindow
 import os
 
-class Window:
+class Window(object):
     DOWN = 1
     UP = -1
     ESC_KEY = 27
