@@ -12,22 +12,16 @@ class InputWindow:
         self.screen.border(0)
         
     def putchar(self, c):
-        line += c
+        with open ("log.txt", "a") as f:
+            f.write("put a char%c\n" % c)
+        self.line += chr(c)  
 
     def clearLine(self):
-        line = ""
+        with open ("log.txt", "a") as f:
+            f.write("cleared a line")
+        self.line = ""
 
     def displayScreen(self):
         # clear screen
         self.screen.erase()
-        self.screen.addstr(0, 0, line)
-
-    def restoreScreen(self):
-        curses.initscr()
-        curses.nocbreak()
-        curses.echo()
-        curses.endwin()
-    
-    # catch any weird termination situations
-    def __del__(self):
-        self.restoreScreen()
+        self.screen.addstr(0, 0, self.line)

@@ -29,7 +29,7 @@ class Window:
     def run(self):
         while True:
             try:
-                self.display.displayScreen()
+                self.displayScreen()
                 # get user command
                 c = self.screen.getch()
                 if c == curses.KEY_UP: 
@@ -38,7 +38,7 @@ class Window:
                     self.display.updown(self.DOWN)
                 elif c == self.ESC_KEY:
                     self.exit()
-                elif c == "\n":
+                elif c == ord('\n'):
                     self.flush_screen()
                 else:
                     self.input_w.putchar(c)
@@ -53,7 +53,7 @@ class Window:
     def displayScreen(self):
         self.display.displayScreen()
         self.input_w.displayScreen()
-
+'''
     def restoreScreen(self):
         curses.initscr()
         curses.nocbreak()
@@ -63,7 +63,7 @@ class Window:
     # catch any weird termination situations
     def __del__(self):
         self.restoreScreen()
-
+'''
 def main(arg):
     ih = Window()
 
