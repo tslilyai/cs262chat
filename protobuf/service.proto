@@ -19,7 +19,7 @@ service ChatApp {
 
 message CMessage {
      int64 m_id = 1;
-     string to_name = 2;
+     int64 to_id = 2;
      string from_name = 3;
      string msg = 4;
      int64 group_id = 5;

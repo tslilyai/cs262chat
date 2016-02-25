@@ -43,7 +43,6 @@ class DisplayScreen:
         thread.start_new_thread(add_lines, ("this is a line\n",))
         '''
 
-        
     def getOutputLines(self):
         self.nOutputLines = len(self.outputLines)
 
