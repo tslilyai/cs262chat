@@ -69,6 +69,15 @@ class ProtobufServer(obj.BetaChatAppServicer):
         return obj.Response(errno=0, msg="success!\n")
 
     @add_logging
+    def rpc_get_or_create_vgid(self, request, context):
+        try:
+            from_id = self.db.get_user_id(request.from_name)
+            vgid = self.db.get_or_create_vgid(request.to_id, from_id)
+        except:
+            vgid = -1
+        return obj.Group(g_id=vgid)
+
+    @add_logging
     @list_to_protobuf(obj.CMessage)
     def rpc_get_messages(self, request, context):
         try:

@@ -45,6 +45,27 @@ class DBManager(object):
         conn.commit()
 
     @thread_safe
+    def get_or_create_vgid(self, conn, c, to_id, from_id):
+        c.execute("SELECT g_id FROM vgroups WHERE (id1 = ? AND id2 = ?) OR (id2 = ? AND id1 = ?)",
+                      [to_id, from_id, from_id, to_id])
+        v = c.fetchone()
+        if v is None:
+            c.execute("SELECT g_id FROM vgroups ORDER BY g_id DESC LIMIT 1")
+            v = c.fetchone()
+            if v is None:
+                v = 0
+            else:
+                v = v[0]
+            c.execute("INSERT INTO vgroups (g_id, id1, id2) VALUES (?, ?, ?)", [v + 2, to_id, from_id])
+            self._insert_ugpair(conn, c, to_id, v+2)
+            self._insert_ugpair(conn, c, from_id, v+2)
+            to_id = v + 2
+        else:
+            to_id = v[0]
+
+        return to_id
+
+    @thread_safe
     def insert_message(self, conn, c, to_id, from_id, msg):
         if len(msg) > 1023:
             raise Exception('Message string too long')
