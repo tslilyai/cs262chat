@@ -33,8 +33,8 @@ import thread
 import time
 from protocols import Protocol
 from collections import defaultdict
-from window import CmdWindow
-#from convo_mode import ConvoWindow
+from window.cmd_mode import CmdWindow
+#from window.convo_mode import ConvoWindow
 
 def poll_for_messages(group_id, p, delay):
     messages = defaultdict(list)
