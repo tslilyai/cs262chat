@@ -30,7 +30,7 @@ class Window:
         while True:
             assert not curses.isendwin()
             try:
-                self.display.displayScreen()
+                self.displayScreen()
                 # get user command
                 c = self.screen.getch()
                 if c == curses.KEY_UP: 
@@ -39,7 +39,7 @@ class Window:
                     self.display.updown(self.DOWN)
                 elif c == self.ESC_KEY:
                     self.exit()
-                elif c == "\n":
+                elif c == ord('\n'):
                     self.flush_screen()
                 else:
                     self.input_w.putchar(c)

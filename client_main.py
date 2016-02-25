@@ -27,6 +27,8 @@ Escape thread mode back to command mode simply by typing ESC.
 '''
 
 import sys
+import curses
+import curses.textpad
 import thread
 import time
 from protocols import Protocol
@@ -47,9 +49,12 @@ def poll_for_messages(p, delay):
                 continue
             else:
                 for m in msgs:
-                    messages[m.from_id].append(m)
+                    messages[m.group_id].append(m)
     except KeyboardInterrupt:
         exit(0)
+
+def get_input():
+    tp = curses.textpad.Textbox(xin)
 
 def main():
     protocol = sys.argv[1]
@@ -59,6 +64,7 @@ def main():
     try:
         p.client_run()
         thread.start_new_thread(poll_for_messages, (p, 1,))
+
     except KeyboardInterrupt:
         exit(0)
     except Exception as e:

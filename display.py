@@ -26,19 +26,18 @@ class DisplayScreen:
         self.markedLineNums = []
         self.getOutputLines()        
 
- 
         # thread that just adds lines
         def add_lines(v):
+            i=0
             while(1):
+                i+=1
                 try:
-                    self.addOutputLine("this is a line")
+                    self.addOutputLine("this is line %d" % i)
                 except KeyboardInterrupt:
                     exit(0)
                 except Exception as e:
                     with open ("log.txt", "a") as f:
                         f.write("CRASHED %s\n" % e)
-                with open ("log.txt", "a") as f:
-                    f.write("added a line!\n")
                 time.sleep(.1)
         thread.start_new_thread(add_lines, ("this is a line\n",))
 
