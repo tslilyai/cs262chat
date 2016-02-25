@@ -12,7 +12,12 @@ class InputWindow:
         self.screen.border(0)
         
     def putchar(self, c):
-        self.line += chr(c)  
+        if c == ord('\b') or c == curses.KEY_BACKSPACE or c == curses.KEY_DC or c == 127:
+            with open('log.txt', 'a') as f:
+                f.write('Erased %s ' %self.line)
+            self.line = self.line[:-1]
+        else:
+            self.line += chr(c)  
 
     def clearLine(self):
         self.line = ""

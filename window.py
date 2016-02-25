@@ -4,6 +4,7 @@ import random
 import time
 from display import DisplayScreen
 from inputw import InputWindow
+import os
 
 class Window:
     DOWN = 1
@@ -33,12 +34,14 @@ class Window:
                 self.displayScreen()
                 # get user command
                 c = self.screen.getch()
+                with open ("log.txt", "a") as f:
+                    f.write("Read %d\n" % c)
                 if c == curses.KEY_UP: 
                     self.display.updown(self.UP)
                 elif c == curses.KEY_DOWN:
                     self.display.updown(self.DOWN)
                 elif c == self.ESC_KEY:
-                    self.exit()
+                    sys.exit()
                 elif c == ord('\n'):
                     self.flush_screen()
                 else:
@@ -59,4 +62,5 @@ def main(screen):
     ih = Window(screen)
 
 if __name__ == "__main__":
+    os.environ.setdefault('ESCDELAY', '25')
     curses.wrapper(main)
