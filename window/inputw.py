@@ -9,7 +9,7 @@ class InputWindow:
             
     def __init__(self, window):
         self.screen = window
-        self.screen.border(0)
+        self.screen.refresh()
         
     def putchar(self, c):
         if c == ord('\b') or c == curses.KEY_BACKSPACE or c == curses.KEY_DC or c == 127:
