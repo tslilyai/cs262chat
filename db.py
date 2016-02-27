@@ -249,7 +249,7 @@ class DBManager(object):
         groups = c.fetchall()
         if groups is None:
             return []
-        return [{'g_id': g[0], 'gname': g[1]} for g in groups]
+        return [{'g_id': g[0], 'g_name': g[1]} for g in groups]
 
     @thread_safe
     def get_accounts(self, conn, c, pattern):

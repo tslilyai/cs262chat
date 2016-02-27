@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='service.proto',
   package='chatapp',
   syntax='proto3',
-  serialized_pb=_b('\n\rservice.proto\x12\x07\x63hatapp\"G\n\x08\x43Message\x12\x0c\n\x04m_id\x18\x01 \x01(\x03\x12\r\n\x05to_id\x18\x02 \x01(\x03\x12\x11\n\tfrom_name\x18\x03 \x01(\t\x12\x0b\n\x03msg\x18\x04 \x01(\t\"L\n\x04User\x12\x0c\n\x04u_id\x18\x01 \x01(\x03\x12\x10\n\x08username\x18\x02 \x01(\t\x12\x10\n\x08password\x18\x03 \x01(\t\x12\x12\n\ncheckpoint\x18\x04 \x01(\x03\"0\n\x08UserPair\x12\x11\n\tusername1\x18\x01 \x01(\t\x12\x11\n\tusername2\x18\x02 \x01(\t\"Q\n\x05Group\x12\x0c\n\x04g_id\x18\x01 \x01(\x03\x12\x0e\n\x06g_name\x18\x02 \x01(\t\x12\x18\n\x10\x65\x64it_member_name\x18\x04 \x01(\t\x12\x10\n\x08new_name\x18\x05 \x01(\t\"&\n\x08Response\x12\r\n\x05\x65rrno\x18\x01 \x01(\x05\x12\x0b\n\x03msg\x18\x02 \x01(\t\"\x1a\n\x07Pattern\x12\x0f\n\x07pattern\x18\x01 \x01(\t2\xd5\x05\n\x07\x43hatApp\x12:\n\x10rpc_send_message\x12\x11.chatapp.CMessage\x1a\x11.chatapp.Response\"\x00\x12\x38\n\x10rpc_get_messages\x12\r.chatapp.User\x1a\x11.chatapp.CMessage\"\x00\x30\x01\x12>\n\x17rpc_create_conversation\x12\x11.chatapp.UserPair\x1a\x0e.chatapp.Group\"\x00\x12\x37\n\x10rpc_create_group\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12\x38\n\x12rpc_create_account\x12\r.chatapp.User\x1a\x11.chatapp.Response\"\x00\x12\x38\n\x12rpc_remove_account\x12\r.chatapp.User\x1a\x11.chatapp.Response\"\x00\x12:\n\x13rpc_edit_group_name\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12>\n\x17rpc_remove_group_member\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12;\n\x14rpc_add_group_member\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12;\n\x16rpc_list_group_members\x12\x0e.chatapp.Group\x1a\r.chatapp.User\"\x00\x30\x01\x12\x37\n\x0frpc_list_groups\x12\x10.chatapp.Pattern\x1a\x0e.chatapp.Group\"\x00\x30\x01\x12\x38\n\x11rpc_list_accounts\x12\x10.chatapp.Pattern\x1a\r.chatapp.User\"\x00\x30\x01\x62\x06proto3')
+  serialized_pb=_b('\n\rservice.proto\x12\x07\x63hatapp\"G\n\x08\x43Message\x12\x0c\n\x04m_id\x18\x01 \x01(\x03\x12\r\n\x05to_id\x18\x02 \x01(\x03\x12\x11\n\tfrom_name\x18\x03 \x01(\t\x12\x0b\n\x03msg\x18\x04 \x01(\t\"L\n\x04User\x12\x0c\n\x04u_id\x18\x01 \x01(\x03\x12\x10\n\x08username\x18\x02 \x01(\t\x12\x10\n\x08password\x18\x03 \x01(\t\x12\x12\n\ncheckpoint\x18\x04 \x01(\x03\"0\n\x08UserPair\x12\x11\n\tusername1\x18\x01 \x01(\t\x12\x11\n\tusername2\x18\x02 \x01(\t\"Q\n\x05Group\x12\x0c\n\x04g_id\x18\x01 \x01(\x03\x12\x0e\n\x06g_name\x18\x02 \x01(\t\x12\x18\n\x10\x65\x64it_member_name\x18\x04 \x01(\t\x12\x10\n\x08new_name\x18\x05 \x01(\t\"&\n\x08Response\x12\r\n\x05\x65rrno\x18\x01 \x01(\x05\x12\x0b\n\x03msg\x18\x02 \x01(\t\"\x1a\n\x07Pattern\x12\x0f\n\x07pattern\x18\x01 \x01(\t2\xce\x05\n\x07\x43hatApp\x12:\n\x10rpc_send_message\x12\x11.chatapp.CMessage\x1a\x11.chatapp.Response\"\x00\x12\x38\n\x10rpc_get_messages\x12\r.chatapp.User\x1a\x11.chatapp.CMessage\"\x00\x30\x01\x12>\n\x17rpc_create_conversation\x12\x11.chatapp.UserPair\x1a\x0e.chatapp.Group\"\x00\x12\x34\n\x10rpc_create_group\x12\x0e.chatapp.Group\x1a\x0e.chatapp.Group\"\x00\x12\x34\n\x12rpc_create_account\x12\r.chatapp.User\x1a\r.chatapp.User\"\x00\x12\x38\n\x12rpc_remove_account\x12\r.chatapp.User\x1a\x11.chatapp.Response\"\x00\x12:\n\x13rpc_edit_group_name\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12>\n\x17rpc_remove_group_member\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12;\n\x14rpc_add_group_member\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12;\n\x16rpc_list_group_members\x12\x0e.chatapp.Group\x1a\r.chatapp.User\"\x00\x30\x01\x12\x37\n\x0frpc_list_groups\x12\x10.chatapp.Pattern\x1a\x0e.chatapp.Group\"\x00\x30\x01\x12\x38\n\x11rpc_list_accounts\x12\x10.chatapp.Pattern\x1a\r.chatapp.User\"\x00\x30\x01\x62\x06proto3')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -472,9 +472,9 @@ def beta_create_ChatApp_server(servicer, pool=None, pool_size=None, default_time
   }
   response_serializers = {
     ('chatapp.ChatApp', 'rpc_add_group_member'): service_pb2.Response.SerializeToString,
-    ('chatapp.ChatApp', 'rpc_create_account'): service_pb2.Response.SerializeToString,
+    ('chatapp.ChatApp', 'rpc_create_account'): service_pb2.User.SerializeToString,
     ('chatapp.ChatApp', 'rpc_create_conversation'): service_pb2.Group.SerializeToString,
-    ('chatapp.ChatApp', 'rpc_create_group'): service_pb2.Response.SerializeToString,
+    ('chatapp.ChatApp', 'rpc_create_group'): service_pb2.Group.SerializeToString,
     ('chatapp.ChatApp', 'rpc_edit_group_name'): service_pb2.Response.SerializeToString,
     ('chatapp.ChatApp', 'rpc_get_messages'): service_pb2.CMessage.SerializeToString,
     ('chatapp.ChatApp', 'rpc_list_accounts'): service_pb2.User.SerializeToString,
@@ -542,9 +542,9 @@ def beta_create_ChatApp_stub(channel, host=None, metadata_transformer=None, pool
   }
   response_deserializers = {
     ('chatapp.ChatApp', 'rpc_add_group_member'): service_pb2.Response.FromString,
-    ('chatapp.ChatApp', 'rpc_create_account'): service_pb2.Response.FromString,
+    ('chatapp.ChatApp', 'rpc_create_account'): service_pb2.User.FromString,
     ('chatapp.ChatApp', 'rpc_create_conversation'): service_pb2.Group.FromString,
-    ('chatapp.ChatApp', 'rpc_create_group'): service_pb2.Response.FromString,
+    ('chatapp.ChatApp', 'rpc_create_group'): service_pb2.Group.FromString,
     ('chatapp.ChatApp', 'rpc_edit_group_name'): service_pb2.Response.FromString,
     ('chatapp.ChatApp', 'rpc_get_messages'): service_pb2.CMessage.FromString,
     ('chatapp.ChatApp', 'rpc_list_accounts'): service_pb2.User.FromString,

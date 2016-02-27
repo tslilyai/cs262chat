@@ -6,8 +6,8 @@ service ChatApp {
     rpc rpc_send_message(CMessage) returns (Response) {}
     rpc rpc_get_messages(User) returns (stream CMessage) {}
     rpc rpc_create_conversation(UserPair) returns (Group) {}
-    rpc rpc_create_group(Group) returns (Response) {}
-    rpc rpc_create_account(User) returns (Response) {}
+    rpc rpc_create_group(Group) returns (Group) {}
+    rpc rpc_create_account(User) returns (User) {}
     rpc rpc_remove_account(User) returns (Response) {}
     rpc rpc_edit_group_name(Group) returns (Response) {}
     rpc rpc_remove_group_member(Group) returns (Response) {}

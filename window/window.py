@@ -41,16 +41,16 @@ class Application(object):
     prompt = "> "
 
     num_args = {
-            "login" : 1,
-            "mk-user" : 1,
-            "ls-groups" : 0,
-            "ls-users" : 0,
-            "ls-group-members" : 1,
-            "mk-group" : 1,
-            "add-group-member" : 2,
-            "remove-group-member" : 2,
-            "talk-with" : 2,
-            "logout" : 0
+            "login" : {1},
+            "mk-user" : {1},
+            "ls-groups" : {0, 1},
+            "ls-users" : {0, 1},
+            "ls-group-members" : {1},
+            "mk-group" : {1},
+            "add-group-member" : {2},
+            "remove-group-member" : {2},
+            "talk-with" : {2},
+            "logout" : {0},
     }
     usage = {
             "login [username]",
@@ -141,7 +141,7 @@ class Application(object):
         # add the cmd to the outputLines
         cmd_args = cmd.strip().split()
         self.addCmdLine(self.prompt + cmd)
-        is_valid = cmd_args[0] in self.num_args and self.num_args[cmd_args[0]] == len(cmd_args[1:])
+        is_valid = cmd_args[0] in self.num_args and len(cmd_args[1:]) in self.num_args[cmd_args[0]] 
         if not is_valid:
             self.addCmdLine("Invalid Command! Valid commands and usage:")
             for line in self.usage:
@@ -179,15 +179,15 @@ class Application(object):
             elif cmd_args[0] == "ls-groups":
                 response = self.P.list_groups() if len(cmd_args) == 1 else self.P.list_groups(cmd_args[1])
                 for group in response:
-                    self.addCmdLine("Group Name: %s\t Group ID: %d" % group)
+                    self.addCmdLine("Group Name: %s\t Group ID: %d" % (group.gname, group.g_id))
             elif cmd_args[0] == "ls-users":
                 response = self.P.list_accounts() if len(cmd_args) == 1 else self.P.list_accounts(cmd_args[1])
                 for user in response:
-                    self.addCmdLine("Username: %s\t User ID: %d" % user)
+                    self.addCmdLine("Username: %s\t User ID: %d" % (user.username, user.u_id))
             elif cmd_args[0] == "ls-group-members":
                 response = self.P.list_group_members(cmd_args[1])
                 for user in response:
-                    self.addCmdLine("Username: %s\t User ID: %d" % user)
+                    self.addCmdLine("Username: %s\t User ID: %d" % (user.username, user.u_id))
             elif cmd_args[0] == "mk-group":
                 response = self.P.create_group(cmd_args[1])
                 if response is not None:
@@ -208,7 +208,7 @@ class Application(object):
                     self.addCmdLine(response)
             elif cmd_args[0] == "logout":
                 self.current_user = None
-                self.addCmdLine("Logged out of account %s" % self.P.username)
+                self.addCmdLine("Logged out of account")
             elif cmd_args[0] == "talk-with":
                 tpe = cmd_args[1]
                 if tpe != "user" and tpe != "group":

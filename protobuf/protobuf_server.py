@@ -85,8 +85,8 @@ class ProtobufServer(obj.BetaChatAppServicer):
             self.db.create_group(groupname)
             g_id = self.db.get_group_id(groupname)
         except Exception as e:
-            return None 
-        return Group(g_id, groupname)
+            return obj.Group(g_id=0, g_name="") 
+        return obj.Group(g_id=g_id, g_name=groupname)
 
     @add_logging
     def rpc_create_account(self, request, context):
@@ -95,8 +95,8 @@ class ProtobufServer(obj.BetaChatAppServicer):
             self.db.create_account(username)
             u_id = self.db.get_group_id(groupname)
         except Exception as e:
-            return None
-        return User(u_id, username) 
+            return obj.User(u_id=0, username="") 
+        return obj.User(u_id=u_id, username=username) 
 
     @add_logging
     def rpc_remove_account(self, request, context):
@@ -125,7 +125,7 @@ class ProtobufServer(obj.BetaChatAppServicer):
     @add_logging
     def rpc_add_group_member(self, request, context):
         try:
-            self.db.add_move_member(request.g_name, request.edit_member_name)
+            self.db.add_group_member(request.g_name, request.edit_member_name)
         except Exception as e:
             return obj.Response(errno=1, msg=e)
         return obj.Response(errno=0, msg="success!\n")
@@ -145,7 +145,7 @@ class ProtobufServer(obj.BetaChatAppServicer):
         try:
             groups = self.db.get_groups(request.pattern)
         except Exception as e:
-            return [{'g_name': 'NULL'}]
+            return [{'g_id' : 0, 'g_name': 'NULL'}]
         return groups
         
     @add_logging

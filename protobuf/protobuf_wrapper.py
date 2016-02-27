@@ -52,14 +52,14 @@ class Protobuf_Protocol(Protocol):
     def create_group(self, groupname):
         group = obj.Group(g_name = groupname)
         new_group = self.Stub.rpc_create_group(group, _TIMEOUT_SECONDS)
-        if new_group is not None:
-            return Group(new_group.g_id, new_group.gname)
+        if new_group.g_id != 0:
+            return Group(new_group.g_id, new_group.g_name)
         else:
             return None
     def create_account(self, username):
         user = obj.User(username=username)
         new_user = self.Stub.rpc_create_account(user, _TIMEOUT_SECONDS)
-        if new_user is not None:
+        if new_user.u_id != 0:
             return User(new_user.u_id, new_user.username)
         else:
             return None
@@ -69,21 +69,21 @@ class Protobuf_Protocol(Protocol):
 
     # GROUPS 
     def edit_group_name(self, old_name, new_name):
-        group = obj.User(g_name=old_name, new_name=new_name)
+        group = obj.Group(g_name=old_name, new_name=new_name)
         return self.__get_response(self.Stub.rpc_edit_group_name(group, _TIMEOUT_SECONDS))
     def remove_group_member(self, groupname, member):
-        group = obj.User(g_name=groupname, edit_member_name=member)
+        group = obj.Group(g_name=groupname, edit_member_name=member)
         return self.__get_response(self.Stub.rpc_remove_group_member(group, _TIMEOUT_SECONDS))
     def add_group_member(self, groupname, member):
-        group = obj.User(g_name=groupname, edit_member_name=member)
+        group = obj.Group(g_name=groupname, edit_member_name=member)
         return self.__get_response(self.Stub.rpc_add_group_member(group, _TIMEOUT_SECONDS))
 
     # LISTING 
-    def list_groups(self, pattern):
+    def list_groups(self, pattern="%"):
         pattern = obj.Pattern(pattern=pattern) 
         groups = self.Stub.rpc_list_groups(pattern, _TIMEOUT_SECONDS)
         return [Group(g.g_id, g.g_name) for g in groups]
-    def list_accounts(self, pattern):
+    def list_accounts(self, pattern="%"):
         pattern = obj.Pattern(pattern=pattern) 
         users = self.Stub.rpc_list_accounts(pattern, _TIMEOUT_SECONDS)
         return [User(u.u_id, u.username) for u in users]
