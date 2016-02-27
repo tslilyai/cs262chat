@@ -38,6 +38,7 @@ class Application(object):
     screen = None
     cmd_history = []
     prompt = "> "
+
     num_args = {
             "login" : 1,
             "mk-user" : 1,
@@ -126,7 +127,7 @@ class Application(object):
                 elif c == ord('\n'):
                     # Interpret command
                     if self.mode == -1:
-                        self.display.setLines(cmd_history)
+                        self.display.setLines(self.cmd_history)
                         self.execute_cmd(self.input_w.line)
                     else:
                         self.display.setLines(self.current_user.formatted_messages)
