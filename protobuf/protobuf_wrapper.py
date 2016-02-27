@@ -22,7 +22,6 @@ class Protobuf_Protocol(Protocol):
     def __init__(self, port):
         self.Channel = implementations.insecure_channel('localhost', port)
         self.Stub = obj.beta_create_ChatApp_stub(self.Channel)
-        self.Username = "" 
 
     # MESSAGING 
     def send_message(self, from_name, dest_id, msg):
