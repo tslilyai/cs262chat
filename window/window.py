@@ -6,7 +6,25 @@ from display import DisplayScreen
 from inputw import InputWindow
 import os
 
-class Window(object):
+from protocols import Message
+
+class LoginUser(object):
+    def __init__(self, username, u_id, checkpoint = 0):
+        self.username = username
+        self.u_id = u_id
+        self.checkpoint = checkpoint
+        self.messages = {}
+        self.formatted_messages = {}
+
+    def add_message(self, message):
+        if to_id not in self.messages:
+            self.messages[message.to_id] = []
+            self.formatted_messages = {}
+        self.messages[message.to_id].append(message)
+        self.formatted_messages[message.to_id].append(
+            '%s: %s' % (message.from_name, message.msg))
+
+class Application(object):
     DOWN = 1
     UP = -1
     ESC_KEY = 27
@@ -26,13 +44,52 @@ class Window(object):
         self.display = DisplayScreen(display_window)
         self.input_w = InputWindow(input_window)
         self.P = protocol
+
+        self.current_user = None
+        self.mode = -1
+
+    def poll_for_messages(self, delay = 1):
+        try:
+            while(1):
+                time.sleep(delay)
+                if self.current_user is None:
+                    continue
+                msgs = self.P.fetch_messages(self.current_user.u_id, checkpoint)
+                # TODO: concurrency
+                for m in msgs:
+                    self.current_user.add_message(m)
+                self.displayScreen()
+        except KeyboardInterrupt:
+            return
         
     def run(self):
-        pass
-
-    def flush_screen(self):
-        self.display.addOutputLine(self.input_w.line)
-        self.input_w.clearLine()
+        while True:
+            assert not curses.isendwin()
+            try:
+                self.displayScreen()
+                # get user command
+                c = self.screen.getch()
+                with open ("log.txt", "a") as f:
+                    f.write("Read %d\n" % c)
+                if c == curses.KEY_UP: 
+                    self.display.updown(self.UP)
+                elif c == curses.KEY_DOWN:
+                    self.display.updown(self.DOWN)
+                elif c == self.ESC_KEY:
+                    self.enter_command_mode()
+                elif c == ord('\n'):
+                    # Interpret command
+                    if self.mode == -1:
+                        self.execute_cmd(self.input_w.line)
+                    else:
+                        self.P.send_message(from_name=current_user.username,
+                                            dest_id=self.mode,
+                                            msg=self.input_w.line)
+                else:
+                    self.input_w.putchar(c)
+            except Exception as e:
+                with open ("log.txt", "a") as f:
+                    f.write("CRASHED %s\n" % e)
 
     def displayScreen(self):
         self.display.displayScreen()
@@ -132,28 +189,3 @@ class CmdWindow(Window):
                 return cmd_args[1]                   
             return "" 
 
-    def run(self):
-        while True:
-            assert not curses.isendwin()
-            try:
-                self.displayScreen()
-                # get user command
-                c = self.screen.getch()
-                with open ("log.txt", "a") as f:
-                    f.write("Read %d\n" % c)
-                if c == curses.KEY_UP: 
-                    self.display.updown(self.UP)
-                elif c == curses.KEY_DOWN:
-                    self.display.updown(self.DOWN)
-                elif c == self.ESC_KEY:
-                    sys.exit()
-                elif c == ord('\n'):
-                    ret = self.execute_cmd()
-                    if ret != "":
-                        return ret
-                    self.flush_screen()
-                else:
-                    self.input_w.putchar(c)
-            except Exception as e:
-                with open ("log.txt", "a") as f:
-                    f.write("CRASHED %s\n" % e)

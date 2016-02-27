@@ -5,37 +5,43 @@ This defines an abstract protocol class that both communication protocols must i
 Front end calls these function (client-side)
 '''
 
-from protobuf.protobuf_wrapper import Protobuf_Protocol
+class Message(object):
+    def __init__(self, m_id, from_name, to_id, msg):
+        self.m_id = m_id
+        self.from_name = from_name
+        self.to_id = to_id
+        self.msg = msg
+
+class Group(object):
+    def __init__(self, g_id, gname):
+        self.g_id = g_id
+        self.gname = gname
+
+class User(object):
+    def __init__(self, u_id, username):
+        self.u_id = u_id
+        self.username = username
 
 class Protocol(object):
-    def __init__(self, protocol):
-        if protocol == "protobuf":
-            self.P = Protobuf_Protocol()
+    '''An abstract class representing a protocol'''
+    def __init__(self, port):
+        raise NotImplementedError
 
     # RUN
     def client_run(self, port="8080"):
-        self.P.client_run(int(port))
-        self.username = "" 
-        print "client running"
+        raise NotImplementedError
 
     ''' 
     MESSAGING 
     '''
-    # returns a success or error message string
-    def send_message(self, dest_id=-1, msg=""):
-        if username == "":
-            return "please login as a user or create a user account"
-        if dest_id == -1 or msg == "":
-            return "please provide a destination id, and message"
-        return self.P.send_individual_message(self.username, dest_id, msg);
+    def send_message(self, from_name, dest_id, msg):
+        '''Returns None on success, or an error string'''
+        raise NotImplementedError
     
     # returns a list of (from, msg) string tuples
-    def fetch_messages(self, dest_id=-1):
-        if self.username == "":
-            return [(None, "please login as a user or create a user account")]
-        if dest_id == -1: 
-            return "please provide a destination id"
-        return self.P.fetch_messages(dest_id)
+    def fetch_messages(self, to_id, checkpoint=0):
+        '''Returns a list of Messages addressed to to_id'''
+        raise NotImplementedError
 
     '''
     CREATION AND DELETION 
@@ -43,59 +49,36 @@ class Protocol(object):
     # returns a success or error message string
     # only creates an empty group
     def create_group(self, groupname=""):
-        if self.username == "":
-            return "please login as a user or create a user account"
-        if groupname == "":
-            return "please provide a groupname"
-        return self.P.create_account(groupname);
+        raise NotImplementedError
     
     # returns a success or error message string
     def create_account(self, username=""):
-        if self.username != "":
-            return "you cannot create an account while logged in"
-        if username == "":
-            return "please provide a username"
-        self.username = username
-        return self.P.create_account(username);
+        raise NotImplementedError
     
     # returns a success or error message string
     def remove_account(self, username=""):
-        if self.username == "":
-            return "please login as a user or create a user account"
-        if username != self.username:
-            return "you cannot remove another user, only your own user account" 
-        self.username = ""
-        return self.P.remove_account(username);
+        raise NotImplementedError
 
     '''
     GROUPS 
     '''
     # returns a success or error message string
     def edit_group_name(self, old_name="", new_name=""):
-        if self.username == "":
-            return "please login as a user or create a user account"
-        if old_name == "" or new_name == "":
-            return "please provide the old and new group names"
+        raise NotImplementedError
     
     # returns a success or error message string
     def remove_group_member(self, groupname="", membername=""):
-        if self.username == "":
-            return "please login as a user or create a user account"
-        if groupname == "" or membername == "":
-            return "please provide a group name and member name"
+        raise NotImplementedError
    
    # returns a success or error message string
     def add_group_member(self, groupname="", membername=""):
-        if self.username == "":
-            return "please login as a user or create a user account"
-        if groupname == "" or membername == "":
-            return "please provide a group name and member name"
+        raise NotImplementedError
 
     # LISTING 
     # returns a list of tuples (name, id)
     def list_groups(self, pattern="%"):
-        self.P.list_groups(pattern)
+        raise NotImplementedError
     def list_accounts(self, pattern="%"):
-        self.P.list_accounts(pattern)
+        raise NotImplementedError
     def list_group_members(self, groupname=""):
-        self.P.list_group_members(groupname)
+        raise NotImplementedError
