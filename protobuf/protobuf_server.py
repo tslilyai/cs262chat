@@ -80,21 +80,22 @@ class ProtobufServer(obj.BetaChatAppServicer):
 
     @add_logging
     def rpc_create_group(self, request, context):
-        groupname = request.g_name
+        g_name = request.g_name
         try:
-            self.db.create_group(groupname)
-            g_id = self.db.get_group_id(groupname)
+            self.db.create_group(g_name)
+            g_id = self.db.get_group_id(g_name)
         except Exception as e:
             return obj.Group(g_id=0, g_name="") 
-        return obj.Group(g_id=g_id, g_name=groupname)
+        return obj.Group(g_id=g_id, g_name=g_name)
 
     @add_logging
     def rpc_create_account(self, request, context):
         username = request.username
         try:
             self.db.create_account(username)
-            u_id = self.db.get_group_id(groupname)
+            u_id = self.db.get_user_id(username)
         except Exception as e:
+            print "user not created: %s" % e
             return obj.User(u_id=0, username="") 
         return obj.User(u_id=u_id, username=username) 
 

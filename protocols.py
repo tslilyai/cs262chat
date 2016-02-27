@@ -13,9 +13,9 @@ class Message(object):
         self.msg = msg
 
 class Group(object):
-    def __init__(self, g_id, gname):
+    def __init__(self, g_id, g_name):
         self.g_id = g_id
-        self.gname = gname
+        self.g_name = g_name
 
 class User(object):
     def __init__(self, u_id, username):
@@ -38,7 +38,6 @@ class Protocol(object):
         '''Returns None on success, or an error string'''
         raise NotImplementedError
     
-    # returns a list of (from, msg) string tuples
     def fetch_messages(self, to_id, checkpoint=0):
         '''Returns a list of Messages addressed to to_id'''
         raise NotImplementedError
@@ -46,40 +45,42 @@ class Protocol(object):
     '''
     CREATION AND DELETION 
     '''
-    # only creates an empty group
-    # returns a group object
-    def create_group(self, groupname=""):
+    def create_group(self, g_name=""):
+        '''Returns a Group object with g_name=g_name'''
         raise NotImplementedError
     
-    # returns a success or error message string
-    # returns a user object
     def create_account(self, username=""):
+        '''Returns a User object with username=username'''
         raise NotImplementedError
     
-    # returns a success or error message string
     def remove_account(self, username=""):
+        '''Returns None or error string'''
         raise NotImplementedError
 
     '''
     GROUPS 
     '''
-    # returns a success or error message string
     def edit_group_name(self, old_name="", new_name=""):
+        '''Returns None or error string'''
         raise NotImplementedError
     
-    # returns a success or error message string
-    def remove_group_member(self, groupname="", membername=""):
+    def remove_group_member(self, g_name="", membername=""):
+        '''Returns None or error string'''
         raise NotImplementedError
    
-   # returns a success or error message string
-    def add_group_member(self, groupname="", membername=""):
+    def add_group_member(self, g_name="", membername=""):
+        '''Returns None or error string'''
         raise NotImplementedError
 
-    # LISTING 
-    # returns a list of tuples (name, id)
+    '''
+    GROUPS 
+    '''
     def list_groups(self, pattern="%"):
+        '''Returns a list of Group objects (empty list if none match)'''
         raise NotImplementedError
     def list_accounts(self, pattern="%"):
+        '''Returns a list of User objects (empty list if none match)'''
         raise NotImplementedError
-    def list_group_members(self, groupname=""):
+    def list_group_members(self, g_name=""):
+        '''Returns a list of User objects (empty list if none)'''
         raise NotImplementedError

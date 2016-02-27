@@ -31,7 +31,7 @@ class DBManager(object):
             CREATE TABLE users (u_id int NOT NULL PRIMARY KEY, username varchar(255) UNIQUE)
         """)
         c.execute("""
-            CREATE TABLE groups (g_id int NOT NULL PRIMARY KEY, gname varchar(255) UNIQUE)
+            CREATE TABLE groups (g_id int NOT NULL PRIMARY KEY, g_name varchar(255) UNIQUE)
         """)
         c.execute("""
             CREATE TABLE vgroups (g_id int NOT NULL PRIMARY KEY, id1 int, id2 int)
@@ -97,8 +97,8 @@ class DBManager(object):
         return v[0]
 
     @thread_safe
-    def get_group_id(self, conn, c, gname):
-        c.execute("SELECT g_id FROM groups WHERE gname=?", [gname])
+    def get_group_id(self, conn, c, g_name):
+        c.execute("SELECT g_id FROM groups WHERE g_name=?", [g_name])
         v = c.fetchone()
         if v is None:
             raise Exception('Group does not exist')
@@ -128,7 +128,7 @@ class DBManager(object):
         return answers
 
     @thread_safe
-    def create_group(self, conn, c, gname):
+    def create_group(self, conn, c, g_name):
         c.execute("SELECT g_id FROM groups ORDER BY g_id DESC LIMIT 1")
         v = c.fetchone()
         if v is None:
@@ -138,10 +138,10 @@ class DBManager(object):
         assert (v % 2 == 1)
         c.execute("""
             INSERT INTO groups 
-                       (g_id, gname)
+                       (g_id, g_name)
                        VALUES
                        (?, ?)
-                       """, [v + 2, gname])
+                       """, [v + 2, g_name])
         conn.commit()
 
     def _insert_ugpair(self, conn, c, u_id, g_id):
@@ -181,7 +181,7 @@ class DBManager(object):
         print "committed"
 
     @thread_safe
-    def add_group_member(self, conn, c, gname, uname):
+    def add_group_member(self, conn, c, g_name, uname):
         c.execute("SELECT u_id FROM users WHERE username=?", [uname])
         u_id = c.fetchone()
         if u_id is None:
@@ -189,7 +189,7 @@ class DBManager(object):
         else:
             u_id = u_id[0]
 
-        c.execute("SELECT g_id FROM groups WHERE gname=?", [gname])
+        c.execute("SELECT g_id FROM groups WHERE g_name=?", [g_name])
         g_id = c.fetchone()
         if g_id is None:
             raise Exception('Group does not exist')
@@ -220,7 +220,7 @@ class DBManager(object):
         conn.commit()
 
     @thread_safe
-    def remove_group_member(self, conn, c, gname, uname):
+    def remove_group_member(self, conn, c, g_name, uname):
         c.execute("SELECT u_id FROM users WHERE username=?", [uname])
         uid = c.fetchone()
         if uid is None:
@@ -228,7 +228,7 @@ class DBManager(object):
         else:
             uid = uid[0]
 
-        c.execute("SELECT g_id FROM groups WHERE gname=?", [gname])
+        c.execute("SELECT g_id FROM groups WHERE g_name=?", [g_name])
         gid = c.fetchone()
         if gid is None:
             raise Exception("Group doesn't exist")
@@ -239,13 +239,13 @@ class DBManager(object):
         conn.commit()
 
     @thread_safe
-    def edit_group_name(self, conn, c, gname, newname):
-        c.execute("UPDATE groups SET gname=? WHERE gname=?", [newname, gname])
+    def edit_group_name(self, conn, c, g_name, newname):
+        c.execute("UPDATE groups SET g_name=? WHERE g_name=?", [newname, g_name])
         conn.commit()
 
     @thread_safe
     def get_groups(self, conn, c, pattern):
-        c.execute("SELECT g_id, gname FROM groups WHERE gname LIKE ?", [pattern])
+        c.execute("SELECT g_id, g_name FROM groups WHERE g_name LIKE ?", [pattern])
         groups = c.fetchall()
         if groups is None:
             return []
@@ -260,12 +260,12 @@ class DBManager(object):
         return [{'u_id': u[0], 'username': u[1]} for u in users]
 
     @thread_safe
-    def get_group_members(self, conn, c, gname):
+    def get_group_members(self, conn, c, g_name):
         c.execute("""
             SELECT users.u_id, users.username FROM
                 users INNER JOIN user_group_pairs ON users.u_id=user_group_pairs.u_id
                 INNER JOIN groups ON user_group_pairs.g_id=groups.g_id
-                WHERE groups.gname=?""", [gname])
+                WHERE groups.g_name=?""", [g_name])
         users = c.fetchall()
         if users is None:
             return []
@@ -313,7 +313,7 @@ if __name__ == '__main__':
     db.add_group_member("dead.people", "agrothendieck")
 
     res = db.get_groups("%s")
-    assert tuple([r['gname'] for r in res]) == ('composers', 'mathematicians', 'students')
+    assert tuple([r['g_name'] for r in res]) == ('composers', 'mathematicians', 'students')
 
     res = db.get_accounts("______")
     assert tuple([r['username'] for r in res]) == ('ludwig', 'johann')
