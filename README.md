@@ -52,7 +52,12 @@ Escape thread mode back to command mode simply by typing ESC.
 
 ### Patterns
 
-
+A highly sophisticated pattern matching language:
+	% matches 0 or more characters
+	_ matches exactly one character
+	[charset] matches sets or ranges of characters
+	[^charset] matches the complement of a set or range of characters
+Coincidentally, this language is also used in the SQL like query: http://www.w3schools.com/sql/sql_wildcards.asp. And when you sanitize SQL queries, these strings are unmodified.
 
 # Communication Protocols API
 This interface should be implemented by any protocol used by the chat server.
@@ -93,20 +98,60 @@ This interface should be implemented by any protocol used by the chat server.
 
 ### LISTING 
     
-    # returns a list of string
+    # returns a list of strings
     def list_groups(self, pattern="%")
     def list_accounts(self, pattern="%")
     def list_group_members(self, groupname="")
 
 
 # Database API 
-    def create_tables(self)
-    def insert_message(self, to_id, from_id, msg)
-    def get_user_id(self, uname)
-    def get_group_id(self, gname)
-    def get_messages(self, u_id)
-    def create_group(self, gname)
-    def create_account(self, uname)
-    def add_group_member(self, gname, uname)
-    def remove_account(self, uname)
-
+        void create_tables(self): creates database tables for the app
+        
+        int get_or_create_vgid(self, int to_id, int from_id):
+            returns the vgroup id for users to_id and from_id. Creates vgroup if it doesn't exist.
+        
+        void insert_message(int to_id, int from_id, string msg):
+            creates a new message from from_id to to_id with content msg.
+            from_id is the id of a user.
+            to_id is the id of a group or vgroup.
+        
+        int get_user_id(string u_name):
+            returns the user id for user with username u_name
+        
+        int get_group_id(string g_name):
+            returns the group id for group with name g_name
+        
+        messages[] get_messages(int u_id, int checkpoint):
+            returns a list of dictionaries representing messages (fields m_id, to_id, from_name, msg)
+            that the user with id u_id could see.
+            All returned messages have id greater than checkpoint.
+        
+        void create_group(string g_name):
+            creates a group with name g_name.
+        
+        void create_account(string u_name):
+            creates a new user with username u_name
+        
+        void add_group_member(string g_name, string u_name):
+            adds user with username u_name to group with name g_name
+        
+        void remove_account(string u_name):
+            Delete user with username u_name
+        
+        void remove_group_member(string g_name, string u_name):
+            Delete user with username u_name from group with name g_name
+        
+        void edit_group_name(string name, string newname):
+            changes name of group with name g_name to newname
+        
+        list(group) get_groups(string pattern):
+            returns a list of groups whose names matches pattern.
+            pattern is specified in SQL pattern syntax.
+        
+        list(user) get_accounts(string pattern):
+            returns a list of users whose usernames matches pattern.
+            pattern is specified in SQL pattern syntax.
+        
+        list(user) get_group_members(string g_name):
+            returns a list of users belong to group with name g_name
+        
