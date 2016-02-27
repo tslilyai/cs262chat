@@ -151,6 +151,9 @@ class Application(object):
             
             # execute the cmd
             if cmd_args[0] == "login":
+                if self.current_user is not None:
+                    self.addCmdLine("Cannot create a user while logged in")
+                    return
                 username = cmd_args[1]
                 users = self.P.list_accounts(username)
                 if users == []:
@@ -160,12 +163,20 @@ class Application(object):
                     self.current_user = LoginUser(user.username, user.u_id)
                     self.addCmdLine("Logged in as %s" % cmd_args[1])
             elif cmd_args[0] == "mk-user":
-                self.P.username = cmd_args[1]
-                response = self.P.create_account(cmd_args[1])
-                if response is None:
+                if self.current_user is not None:
+                    self.addCmdLine("Cannot create a user while logged in")
+                    return
+                user = self.P.create_account(cmd_args[1])
+                if user is not None:
+                    self.current_user = LoginUser(cmd_args[1], user.u_id)
                     self.addCmdLine("Created account and logged in as %s" % cmd_args[1])
                 else:
-                    self.addCmdLine(response)
+                    self.addCmdLine("Could not create account")
+
+            # all following commands must be called while logged in
+            elif self.current_user is None:
+                self.addCmdLine("Cannot call %s while not logged in" % cmd_args[0])
+                return
             elif cmd_args[0] == "ls-groups":
                 response = self.P.list_groups() if len(cmd_args) == 1 else self.P.list_groups(cmd_args[1])
                 for group in response:
@@ -180,10 +191,10 @@ class Application(object):
                     self.addCmdLine("Username: %s\t User ID: %d" % user)
             elif cmd_args[0] == "mk-group":
                 response = self.P.create_group(cmd_args[1])
-                if response is None:
+                if response is not None:
                     self.addCmdLine("Created group %s" % cmd_args[1])
                 else:
-                    self.addCmdLine(response)
+                    self.addCmdLine("Could not create account")
             elif cmd_args[0] == "add-group-member":
                 response = self.P.add_group_member(cmd_args[1], cmd_args[2])
                 if response is None:

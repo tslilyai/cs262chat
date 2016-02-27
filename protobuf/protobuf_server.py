@@ -83,21 +83,20 @@ class ProtobufServer(obj.BetaChatAppServicer):
         groupname = request.g_name
         try:
             self.db.create_group(groupname)
+            g_id = self.db.get_group_id(groupname)
         except Exception as e:
-            return obj.Response(errno=1, msg=str(e))
-        return obj.Response(errno=0, msg="success!\n")
+            return None 
+        return Group(g_id, groupname)
 
     @add_logging
     def rpc_create_account(self, request, context):
         username = request.username
-        print "username is %s" % username
         try:
-            print "creating account..."
             self.db.create_account(username)
-            print "created account!"
+            u_id = self.db.get_group_id(groupname)
         except Exception as e:
-            return obj.Response(errno=1, msg=str(e))
-        return obj.Response(errno=0, msg="success!\n")
+            return None
+        return User(u_id, username) 
 
     @add_logging
     def rpc_remove_account(self, request, context):

@@ -51,11 +51,18 @@ class Protobuf_Protocol(Protocol):
     # CREATION AND DELETION 
     def create_group(self, groupname):
         group = obj.Group(g_name = groupname)
-        return self.__get_response(self.Stub.rpc_create_group(group, _TIMEOUT_SECONDS))
+        new_group = self.Stub.rpc_create_group(group, _TIMEOUT_SECONDS)
+        if new_group is not None:
+            return Group(new_group.g_id, new_group.gname)
+        else:
+            return None
     def create_account(self, username):
         user = obj.User(username=username)
-        response = self.Stub.rpc_create_account(user, _TIMEOUT_SECONDS)
-        return self.__get_response(response)
+        new_user = self.Stub.rpc_create_account(user, _TIMEOUT_SECONDS)
+        if new_user is not None:
+            return User(new_user.u_id, new_user.username)
+        else:
+            return None
     def remove_account(self):
         user = obj.User(username=username)
         return self.__get_response(self.Stub.rpc_remove_account(user, _TIMEOUT_SECONDS))

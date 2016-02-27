@@ -46,12 +46,13 @@ class Protocol(object):
     '''
     CREATION AND DELETION 
     '''
-    # returns a success or error message string
     # only creates an empty group
+    # returns a group object
     def create_group(self, groupname=""):
         raise NotImplementedError
     
     # returns a success or error message string
+    # returns a user object
     def create_account(self, username=""):
         raise NotImplementedError
     
