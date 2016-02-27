@@ -75,6 +75,8 @@ class ProtobufServer(obj.BetaChatAppServicer):
             u2 = self.db.get_user_id(request.username2)
             gid = self.db.get_or_create_vgid(u1, u2)
             return obj.Group(g_id=gid)
+        except Exception as e:
+            return obj.Response(errno=1, msg=str(e))
 
     @add_logging
     def rpc_create_group(self, request, context):
@@ -82,7 +84,7 @@ class ProtobufServer(obj.BetaChatAppServicer):
         try:
             self.db.create_group(groupname)
         except Exception as e:
-            return obj.Response(errno=1, msg=e)
+            return obj.Response(errno=1, msg=str(e))
         return obj.Response(errno=0, msg="success!\n")
 
     @add_logging

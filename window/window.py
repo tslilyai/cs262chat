@@ -6,6 +6,8 @@ from display import DisplayScreen
 from inputw import InputWindow
 import os
 
+import thread
+
 from protocols import Message
 
 class LoginUser(object):
@@ -106,6 +108,7 @@ class Application(object):
             return
         
     def run(self):
+        thread.start_new_thread(self.poll_for_messages, tuple())
         while True:
             assert not curses.isendwin()
             try:
@@ -119,7 +122,7 @@ class Application(object):
                 elif c == curses.KEY_DOWN:
                     self.display.updown(self.DOWN)
                 elif c == self.ESC_KEY:
-                    self.enter_command_mode()
+                    self.mode = -1
                 elif c == ord('\n'):
                     # Interpret command
                     if self.mode == -1:

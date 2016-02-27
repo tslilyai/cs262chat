@@ -3,8 +3,7 @@ syntax = "proto3";
 package chatapp;
 
 service ChatApp {
-    rpc rpc_send_individual_message(CMessage) returns (Response) {}
-    rpc rpc_send_group_message(CMessage) returns (Response) {}
+    rpc rpc_send_message(CMessage) returns (Response) {}
     rpc rpc_get_messages(User) returns (stream CMessage) {}
     rpc rpc_create_conversation(UserPair) returns (Group) {}
     rpc rpc_create_group(Group) returns (Response) {}

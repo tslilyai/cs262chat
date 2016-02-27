@@ -32,44 +32,20 @@ import curses
 import curses.textpad
 import thread
 import time
-from protocols import Protocol
-from collections import defaultdict
-from window.cmd_mode import CmdWindow
-#from window.convo_mode import ConvoWindow
 
-def poll_for_messages(group_id, p, delay):
-    messages = defaultdict(list)
-    try:
-        while(1):
-            time.sleep(delay)
-            msgs = p.fetch_messages(group_id)
-            # not logged in yet, just keep looping 
-            if msgs[0][0] == None:
-                # print on screen "not logged in, no messages"
-                continue
-            else:
-                for m in msgs:
-                    messages[m.group_id].append(m)
-    except KeyboardInterrupt:
-        exit(0)
+from protobuf.protobuf_wrapper import Protobuf_Protocol
+from collections import defaultdict
+from window.window import Application
+
 
 def main(screen):
     protocol = sys.argv[1]
     port = sys.argv[2]
-    p = Protocol(protocol)
-    
-    cmd_window = CmdWindow(screen, p)
-#    conversation_window = ConvoWindow(screen, p)
+    if protocol == 'protobuf':
+        p = Protobuf_Protocol(int(port))
 
-    try:
-        p.client_run()
-        while(1):
-            group_id = cmd_window.run()
-            conversation_window.enter_convo_mode(group_or_user_id)
-    except KeyboardInterrupt:
-        exit(0)
-    except Exception as e:
-        print "Error running client: %s" % e
+    window = Application(screen, p)
+    window.run()    
 
 if __name__ == "__main__":
     os.environ.setdefault('ESCDELAY', '25')
