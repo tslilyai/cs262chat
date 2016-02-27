@@ -128,7 +128,7 @@ class DBManager(object):
             SELECT messages.m_id, messages.to_id, messages.from_id, messages.msg
                 FROM messages INNER JOIN user_group_pairs ON
                     messages.to_id=user_group_pairs.g_id
-                WHERE user_group_pairs.u_id=? AND messages.m_id>checkpoint
+                WHERE user_group_pairs.u_id=? AND messages.m_id>?
                 ORDER BY messages.m_id ASC
             """, [u_id, checkpoint])
         rows = c.fetchall()

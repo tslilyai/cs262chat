@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='service.proto',
   package='chatapp',
   syntax='proto3',
-  serialized_pb=_b('\n\rservice.proto\x12\x07\x63hatapp\"I\n\x08\x43Message\x12\x0c\n\x04m_id\x18\x01 \x01(\x03\x12\x0f\n\x07to_name\x18\x02 \x01(\t\x12\x11\n\tfrom_name\x18\x03 \x01(\t\x12\x0b\n\x03msg\x18\x04 \x01(\t\"8\n\x04User\x12\x0c\n\x04u_id\x18\x01 \x01(\x03\x12\x10\n\x08username\x18\x02 \x01(\t\x12\x10\n\x08password\x18\x03 \x01(\t\"e\n\x05Group\x12\x0c\n\x04g_id\x18\x01 \x01(\x03\x12\x0e\n\x06g_name\x18\x02 \x01(\t\x12\x12\n\nmember_ids\x18\x03 \x03(\x03\x12\x18\n\x10\x65\x64it_member_name\x18\x04 \x01(\t\x12\x10\n\x08new_name\x18\x05 \x01(\t\"&\n\x08Response\x12\r\n\x05\x65rrno\x18\x01 \x01(\x05\x12\x0b\n\x03msg\x18\x02 \x01(\t\"\x1a\n\x07Pattern\x12\x0f\n\x07pattern\x18\x01 \x01(\t2\xe2\x05\n\x07\x43hatApp\x12\x45\n\x1brpc_send_individual_message\x12\x11.chatapp.CMessage\x1a\x11.chatapp.Response\"\x00\x12@\n\x16rpc_send_group_message\x12\x11.chatapp.CMessage\x1a\x11.chatapp.Response\"\x00\x12\x38\n\x10rpc_get_messages\x12\r.chatapp.User\x1a\x11.chatapp.CMessage\"\x00\x30\x01\x12\x37\n\x10rpc_create_group\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12\x38\n\x12rpc_create_account\x12\r.chatapp.User\x1a\x11.chatapp.Response\"\x00\x12\x38\n\x12rpc_remove_account\x12\r.chatapp.User\x1a\x11.chatapp.Response\"\x00\x12:\n\x13rpc_edit_group_name\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12>\n\x17rpc_remove_group_member\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12;\n\x14rpc_add_group_member\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12;\n\x16rpc_list_group_members\x12\x0e.chatapp.Group\x1a\r.chatapp.User\"\x00\x30\x01\x12\x37\n\x0frpc_list_groups\x12\x10.chatapp.Pattern\x1a\x0e.chatapp.Group\"\x00\x30\x01\x12\x38\n\x11rpc_list_accounts\x12\x10.chatapp.Pattern\x1a\r.chatapp.User\"\x00\x30\x01\x62\x06proto3')
+  serialized_pb=_b('\n\rservice.proto\x12\x07\x63hatapp\"G\n\x08\x43Message\x12\x0c\n\x04m_id\x18\x01 \x01(\x03\x12\r\n\x05to_id\x18\x02 \x01(\x03\x12\x11\n\tfrom_name\x18\x03 \x01(\t\x12\x0b\n\x03msg\x18\x04 \x01(\t\"L\n\x04User\x12\x0c\n\x04u_id\x18\x01 \x01(\x03\x12\x10\n\x08username\x18\x02 \x01(\t\x12\x10\n\x08password\x18\x03 \x01(\t\x12\x12\n\ncheckpoint\x18\x04 \x01(\x03\"0\n\x08UserPair\x12\x11\n\tusername1\x18\x01 \x01(\t\x12\x11\n\tusername2\x18\x02 \x01(\t\"Q\n\x05Group\x12\x0c\n\x04g_id\x18\x01 \x01(\x03\x12\x0e\n\x06g_name\x18\x02 \x01(\t\x12\x18\n\x10\x65\x64it_member_name\x18\x04 \x01(\t\x12\x10\n\x08new_name\x18\x05 \x01(\t\"&\n\x08Response\x12\r\n\x05\x65rrno\x18\x01 \x01(\x05\x12\x0b\n\x03msg\x18\x02 \x01(\t\"\x1a\n\x07Pattern\x12\x0f\n\x07pattern\x18\x01 \x01(\t2\xa2\x06\n\x07\x43hatApp\x12\x45\n\x1brpc_send_individual_message\x12\x11.chatapp.CMessage\x1a\x11.chatapp.Response\"\x00\x12@\n\x16rpc_send_group_message\x12\x11.chatapp.CMessage\x1a\x11.chatapp.Response\"\x00\x12\x38\n\x10rpc_get_messages\x12\r.chatapp.User\x1a\x11.chatapp.CMessage\"\x00\x30\x01\x12>\n\x17rpc_create_conversation\x12\x11.chatapp.UserPair\x1a\x0e.chatapp.Group\"\x00\x12\x37\n\x10rpc_create_group\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12\x38\n\x12rpc_create_account\x12\r.chatapp.User\x1a\x11.chatapp.Response\"\x00\x12\x38\n\x12rpc_remove_account\x12\r.chatapp.User\x1a\x11.chatapp.Response\"\x00\x12:\n\x13rpc_edit_group_name\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12>\n\x17rpc_remove_group_member\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12;\n\x14rpc_add_group_member\x12\x0e.chatapp.Group\x1a\x11.chatapp.Response\"\x00\x12;\n\x16rpc_list_group_members\x12\x0e.chatapp.Group\x1a\r.chatapp.User\"\x00\x30\x01\x12\x37\n\x0frpc_list_groups\x12\x10.chatapp.Pattern\x1a\x0e.chatapp.Group\"\x00\x30\x01\x12\x38\n\x11rpc_list_accounts\x12\x10.chatapp.Pattern\x1a\r.chatapp.User\"\x00\x30\x01\x62\x06proto3')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -41,9 +41,9 @@ _CMESSAGE = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='to_name', full_name='chatapp.CMessage.to_name', index=1,
-      number=2, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
+      name='to_id', full_name='chatapp.CMessage.to_id', index=1,
+      number=2, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
@@ -74,7 +74,7 @@ _CMESSAGE = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=26,
-  serialized_end=99,
+  serialized_end=97,
 )
 
 
@@ -106,6 +106,13 @@ _USER = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='checkpoint', full_name='chatapp.User.checkpoint', index=3,
+      number=4, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -118,8 +125,46 @@ _USER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=101,
-  serialized_end=157,
+  serialized_start=99,
+  serialized_end=175,
+)
+
+
+_USERPAIR = _descriptor.Descriptor(
+  name='UserPair',
+  full_name='chatapp.UserPair',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='username1', full_name='chatapp.UserPair.username1', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='username2', full_name='chatapp.UserPair.username2', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=177,
+  serialized_end=225,
 )
 
 
@@ -145,21 +190,14 @@ _GROUP = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='member_ids', full_name='chatapp.Group.member_ids', index=2,
-      number=3, type=3, cpp_type=2, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='edit_member_name', full_name='chatapp.Group.edit_member_name', index=3,
+      name='edit_member_name', full_name='chatapp.Group.edit_member_name', index=2,
       number=4, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='new_name', full_name='chatapp.Group.new_name', index=4,
+      name='new_name', full_name='chatapp.Group.new_name', index=3,
       number=5, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -177,8 +215,8 @@ _GROUP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=159,
-  serialized_end=260,
+  serialized_start=227,
+  serialized_end=308,
 )
 
 
@@ -215,8 +253,8 @@ _RESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=262,
-  serialized_end=300,
+  serialized_start=310,
+  serialized_end=348,
 )
 
 
@@ -246,12 +284,13 @@ _PATTERN = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=302,
-  serialized_end=328,
+  serialized_start=350,
+  serialized_end=376,
 )
 
 DESCRIPTOR.message_types_by_name['CMessage'] = _CMESSAGE
 DESCRIPTOR.message_types_by_name['User'] = _USER
+DESCRIPTOR.message_types_by_name['UserPair'] = _USERPAIR
 DESCRIPTOR.message_types_by_name['Group'] = _GROUP
 DESCRIPTOR.message_types_by_name['Response'] = _RESPONSE
 DESCRIPTOR.message_types_by_name['Pattern'] = _PATTERN
@@ -269,6 +308,13 @@ User = _reflection.GeneratedProtocolMessageType('User', (_message.Message,), dic
   # @@protoc_insertion_point(class_scope:chatapp.User)
   ))
 _sym_db.RegisterMessage(User)
+
+UserPair = _reflection.GeneratedProtocolMessageType('UserPair', (_message.Message,), dict(
+  DESCRIPTOR = _USERPAIR,
+  __module__ = 'service_pb2'
+  # @@protoc_insertion_point(class_scope:chatapp.UserPair)
+  ))
+_sym_db.RegisterMessage(UserPair)
 
 Group = _reflection.GeneratedProtocolMessageType('Group', (_message.Message,), dict(
   DESCRIPTOR = _GROUP,
@@ -308,6 +354,9 @@ class BetaChatAppServicer(object):
     raise NotImplementedError()
   @abc.abstractmethod
   def rpc_get_messages(self, request, context):
+    raise NotImplementedError()
+  @abc.abstractmethod
+  def rpc_create_conversation(self, request, context):
     raise NotImplementedError()
   @abc.abstractmethod
   def rpc_create_group(self, request, context):
@@ -351,6 +400,10 @@ class BetaChatAppStub(object):
   @abc.abstractmethod
   def rpc_get_messages(self, request, timeout):
     raise NotImplementedError()
+  @abc.abstractmethod
+  def rpc_create_conversation(self, request, timeout):
+    raise NotImplementedError()
+  rpc_create_conversation.future = None
   @abc.abstractmethod
   def rpc_create_group(self, request, timeout):
     raise NotImplementedError()
@@ -410,9 +463,12 @@ def beta_create_ChatApp_server(servicer, pool=None, pool_size=None, default_time
   import service_pb2
   import service_pb2
   import service_pb2
+  import service_pb2
+  import service_pb2
   request_deserializers = {
     ('chatapp.ChatApp', 'rpc_add_group_member'): service_pb2.Group.FromString,
     ('chatapp.ChatApp', 'rpc_create_account'): service_pb2.User.FromString,
+    ('chatapp.ChatApp', 'rpc_create_conversation'): service_pb2.UserPair.FromString,
     ('chatapp.ChatApp', 'rpc_create_group'): service_pb2.Group.FromString,
     ('chatapp.ChatApp', 'rpc_edit_group_name'): service_pb2.Group.FromString,
     ('chatapp.ChatApp', 'rpc_get_messages'): service_pb2.User.FromString,
@@ -427,6 +483,7 @@ def beta_create_ChatApp_server(servicer, pool=None, pool_size=None, default_time
   response_serializers = {
     ('chatapp.ChatApp', 'rpc_add_group_member'): service_pb2.Response.SerializeToString,
     ('chatapp.ChatApp', 'rpc_create_account'): service_pb2.Response.SerializeToString,
+    ('chatapp.ChatApp', 'rpc_create_conversation'): service_pb2.Group.SerializeToString,
     ('chatapp.ChatApp', 'rpc_create_group'): service_pb2.Response.SerializeToString,
     ('chatapp.ChatApp', 'rpc_edit_group_name'): service_pb2.Response.SerializeToString,
     ('chatapp.ChatApp', 'rpc_get_messages'): service_pb2.CMessage.SerializeToString,
@@ -441,6 +498,7 @@ def beta_create_ChatApp_server(servicer, pool=None, pool_size=None, default_time
   method_implementations = {
     ('chatapp.ChatApp', 'rpc_add_group_member'): face_utilities.unary_unary_inline(servicer.rpc_add_group_member),
     ('chatapp.ChatApp', 'rpc_create_account'): face_utilities.unary_unary_inline(servicer.rpc_create_account),
+    ('chatapp.ChatApp', 'rpc_create_conversation'): face_utilities.unary_unary_inline(servicer.rpc_create_conversation),
     ('chatapp.ChatApp', 'rpc_create_group'): face_utilities.unary_unary_inline(servicer.rpc_create_group),
     ('chatapp.ChatApp', 'rpc_edit_group_name'): face_utilities.unary_unary_inline(servicer.rpc_edit_group_name),
     ('chatapp.ChatApp', 'rpc_get_messages'): face_utilities.unary_stream_inline(servicer.rpc_get_messages),
@@ -480,9 +538,12 @@ def beta_create_ChatApp_stub(channel, host=None, metadata_transformer=None, pool
   import service_pb2
   import service_pb2
   import service_pb2
+  import service_pb2
+  import service_pb2
   request_serializers = {
     ('chatapp.ChatApp', 'rpc_add_group_member'): service_pb2.Group.SerializeToString,
     ('chatapp.ChatApp', 'rpc_create_account'): service_pb2.User.SerializeToString,
+    ('chatapp.ChatApp', 'rpc_create_conversation'): service_pb2.UserPair.SerializeToString,
     ('chatapp.ChatApp', 'rpc_create_group'): service_pb2.Group.SerializeToString,
     ('chatapp.ChatApp', 'rpc_edit_group_name'): service_pb2.Group.SerializeToString,
     ('chatapp.ChatApp', 'rpc_get_messages'): service_pb2.User.SerializeToString,
@@ -497,6 +558,7 @@ def beta_create_ChatApp_stub(channel, host=None, metadata_transformer=None, pool
   response_deserializers = {
     ('chatapp.ChatApp', 'rpc_add_group_member'): service_pb2.Response.FromString,
     ('chatapp.ChatApp', 'rpc_create_account'): service_pb2.Response.FromString,
+    ('chatapp.ChatApp', 'rpc_create_conversation'): service_pb2.Group.FromString,
     ('chatapp.ChatApp', 'rpc_create_group'): service_pb2.Response.FromString,
     ('chatapp.ChatApp', 'rpc_edit_group_name'): service_pb2.Response.FromString,
     ('chatapp.ChatApp', 'rpc_get_messages'): service_pb2.CMessage.FromString,
@@ -511,6 +573,7 @@ def beta_create_ChatApp_stub(channel, host=None, metadata_transformer=None, pool
   cardinalities = {
     'rpc_add_group_member': cardinality.Cardinality.UNARY_UNARY,
     'rpc_create_account': cardinality.Cardinality.UNARY_UNARY,
+    'rpc_create_conversation': cardinality.Cardinality.UNARY_UNARY,
     'rpc_create_group': cardinality.Cardinality.UNARY_UNARY,
     'rpc_edit_group_name': cardinality.Cardinality.UNARY_UNARY,
     'rpc_get_messages': cardinality.Cardinality.UNARY_STREAM,

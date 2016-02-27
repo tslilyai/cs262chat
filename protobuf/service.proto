@@ -33,8 +33,8 @@ message User {
 }
 
 message UserPair {
-    string username1;
-    string username2;
+    string username1 = 1;
+    string username2 = 2;
 }
 
 message Group {
