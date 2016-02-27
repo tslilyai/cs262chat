@@ -47,7 +47,7 @@ class DBManager(object):
     @thread_safe
     def get_or_create_vgid(self, conn, c, to_id, from_id):
         c.execute("SELECT g_id FROM vgroups WHERE (id1 = ? AND id2 = ?) OR (id2 = ? AND id1 = ?)",
-                      [to_id, from_id, from_id, to_id])
+                      [to_id, from_id, to_id, from_id])
         v = c.fetchone()
         if v is None:
             c.execute("SELECT g_id FROM vgroups ORDER BY g_id DESC LIMIT 1")
@@ -60,6 +60,7 @@ class DBManager(object):
             self._insert_ugpair(conn, c, to_id, v+2)
             self._insert_ugpair(conn, c, from_id, v+2)
             to_id = v + 2
+            conn.commit()
         else:
             to_id = v[0]
 
@@ -70,24 +71,6 @@ class DBManager(object):
         if len(msg) > 1023:
             raise Exception('Message string too long')
 
-        if to_id % 2 == 0:
-            # User id. Look up vgroup
-            c.execute("SELECT g_id FROM vgroups WHERE (id1 = ? AND id2 = ?) OR (id2 = ? AND id1 = ?)",
-                          [to_id, from_id, from_id, to_id])
-            v = c.fetchone()
-            if v is None:
-                c.execute("SELECT g_id FROM vgroups ORDER BY g_id DESC LIMIT 1")
-                v = c.fetchone()
-                if v is None:
-                    v = 0
-                else:
-                    v = v[0]
-                c.execute("INSERT INTO vgroups (g_id, id1, id2) VALUES (?, ?, ?)", [v + 2, to_id, from_id])
-                self._insert_ugpair(conn, c, to_id, v+2)
-                self._insert_ugpair(conn, c, from_id, v+2)
-                to_id = v + 2
-            else:
-                to_id = v[0]
         c.execute("""
             SELECT m_id FROM messages ORDER BY m_id DESC LIMIT 1
         """)

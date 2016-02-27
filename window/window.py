@@ -94,7 +94,8 @@ class Application(object):
                 for m in msgs:
                     self.current_user.add_message(m)
                 if self.mode != -1:
-                    self.displayScreen()
+                    self.display.setLines(self.current_user.formatted_messages[self.mode])
+                self.displayScreen()
         except KeyboardInterrupt:
             return
         
@@ -105,8 +106,8 @@ class Application(object):
             if self.mode == -1:
                 self.display.setLines(self.cmd_history)
             else:
-                with open('log.txt', 'a') as f:
-                    f.write('Mode: %s\n' % self.mode)
+                if self.mode not in self.current_user.formatted_messages:
+                    self.current_user.formatted_messages[self.mode] = []
                 self.display.setLines(self.current_user.formatted_messages[self.mode])
             self.displayScreen()
             # get user command
@@ -120,11 +121,9 @@ class Application(object):
             elif c == ord('\n'):
                 # Interpret command
                 if self.mode == -1:
-                    self.display.setLines(self.cmd_history)
                     self.execute_cmd(self.input_w.line)
                 else:
-                    self.display.setLines(self.current_user.formatted_messages)
-                    self.P.send_message(from_name=current_user.username,
+                    self.P.send_message(from_name=self.current_user.username,
                                         dest_id=self.mode,
                                         msg=self.input_w.line)
                 self.input_w.clearLine()
@@ -201,16 +200,17 @@ class Application(object):
                 self.addCmdLine("Logged out of account %s" % self.P.username)
             elif cmd_args[0] == "talk-with":
                 tpe = cmd_args[1]
-                if tpe != "user" or tpe != "group":
+                if tpe != "user" and tpe != "group":
                     self.addCmdLine("Type of conversation must be either user or group.")
+                    return
                 to_name = cmd_args[2]
                 if tpe == "user":
-                    convo_id = self.P.create_conversation(self.current_user.username, cmd_args[1])
-                    self.mode = convo_id
+                    convo_id = self.P.create_conversation(self.current_user.username, to_name)
+                    self.mode = int(convo_id)
                 elif tpe == "group":
                     groups = self.P.list_groups(to_name)
                     if groups == []:
                         self.addCmdLine("Group %s does not exist." % to_name)
                     else:
-                        self.mode = groups[0].g_id
-                return
+                        self.mode = int(groups[0].g_id)
+                self.displayScreen()
