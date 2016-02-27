@@ -1,4 +1,8 @@
 """
+Adapted from source code provided by Lyle Scott
+Original code can be obtained here:
+    https://github.com/LyleScott/Python-curses-Scrolling-Example
+
 Lyle Scott, III
 lyle@digitalfoo.net
 A simple demo that uses curses to scroll the terminal.
@@ -6,9 +10,6 @@ A simple demo that uses curses to scroll the terminal.
 
 import curses
 import sys
-import random
-import time
-import thread
 
 class DisplayScreen:
     DOWN = 1
@@ -23,8 +24,7 @@ class DisplayScreen:
         self.screen.border(0)
         self.topLineNum = 0
         self.markedLineNums = []
-        self.getOutputLines()        
-
+        self.nOutputLines = 0
 
     def setLines(self, lines, adjust=False):
         was_last_page = self.topLineNum + self.screen.getmaxyx()[0] >= self.nOutputLines + 1
@@ -36,16 +36,6 @@ class DisplayScreen:
             if was_last_page:
                 self.topLineNum = max(0, self.nOutputLines - self.screen.getmaxyx()[0] + 1)
 
-        self.displayScreen()
-
-    def getOutputLines(self):
-        self.nOutputLines = len(self.outputLines)
-
-    def addOutputLine(self, line):
-        self.outputLines.append(line)
-        self.nOutputLines += 1
-        if self.topLineNum + self.screen.getmaxyx()[0] == self.nOutputLines:
-            self.topLineNum+=1
         self.displayScreen()
 
     def displayScreen(self):

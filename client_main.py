@@ -2,30 +2,32 @@
 The main function to start and run the client lives here!
 '''
 
-import sys
-import os
+import argparse
 import curses
-import curses.textpad
-import thread
-import time
+import os
 
-from protobuf.protobuf_wrapper import Protobuf_Protocol
-from collections import defaultdict
 from frontend.application import Application
-
+from protobuf.protobuf_client import ProtobufProtocol
 
 def main(screen):
-    if len(sys.argv) != 3:
-        print "Usage: python client_main.py [protobuf / custom] [port]"
-
-    protocol = sys.argv[1]
-    port = sys.argv[2]
-    if protocol == 'protobuf':
-        p = Protobuf_Protocol(int(port))
+    if args.protocol == 'protobuf':
+        p = ProtobufProtocol(args.host, int(args.port))
 
     window = Application(screen, p)
     window.run()    
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Chat client.')
+    parser.add_argument('--protocol', dest='protocol', action='store',
+            default='protobuf', help='Protocol to use (default=protobuf)')
+    parser.add_argument('--port', dest='port', action='store',
+            default='8080', help="Server's port (default=8080)")
+    parser.add_argument('--host', dest='host', action='store',
+            default='localhost', help="Server host (default=localhost)")
+
+    args = parser.parse_args()
+
+    # By default, curses delays 1 second before returning ESC to us
+    # This environment variable controls the delay lag in milliseconds
     os.environ.setdefault('ESCDELAY', '25')
     curses.wrapper(main)

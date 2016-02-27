@@ -10,7 +10,7 @@ from protocols import Protocol, Message, User, Group
 
 _TIMEOUT_SECONDS = 30
 
-class Protobuf_Protocol(Protocol):
+class ProtobufProtocol(Protocol):
 
     def __get_response(self, response):
         if response.errno:
@@ -19,7 +19,7 @@ class Protobuf_Protocol(Protocol):
             return None
 
     # RUN
-    def __init__(self, port):
+    def __init__(self, host, port):
         self.Channel = implementations.insecure_channel('localhost', port)
         self.Stub = obj.beta_create_ChatApp_stub(self.Channel)
 
@@ -71,9 +71,11 @@ class Protobuf_Protocol(Protocol):
     def edit_group_name(self, old_name, new_name):
         group = obj.Group(g_name=old_name, new_name=new_name)
         return self.__get_response(self.Stub.rpc_edit_group_name(group, _TIMEOUT_SECONDS))
+
     def remove_group_member(self, groupname, member):
         group = obj.Group(g_name=groupname, edit_member_name=member)
         return self.__get_response(self.Stub.rpc_remove_group_member(group, _TIMEOUT_SECONDS))
+
     def add_group_member(self, groupname, member):
         group = obj.Group(g_name=groupname, edit_member_name=member)
         return self.__get_response(self.Stub.rpc_add_group_member(group, _TIMEOUT_SECONDS))
@@ -83,10 +85,12 @@ class Protobuf_Protocol(Protocol):
         pattern = obj.Pattern(pattern=pattern) 
         groups = self.Stub.rpc_list_groups(pattern, _TIMEOUT_SECONDS)
         return [Group(g.g_id, g.g_name) for g in groups]
+
     def list_accounts(self, pattern="%"):
         pattern = obj.Pattern(pattern=pattern) 
         users = self.Stub.rpc_list_accounts(pattern, _TIMEOUT_SECONDS)
         return [User(u.u_id, u.username) for u in users]
+
     def list_group_members(self, groupname):
         group = obj.Group(
             g_name=groupname

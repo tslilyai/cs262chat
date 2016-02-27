@@ -39,9 +39,8 @@ message UserPair {
 message Group {
      int64 g_id = 1;
      string g_name = 2;
-//   repeated int64 member_ids = 3;
-     string edit_member_name = 4;
-     string new_name = 5;
+     string edit_member_name = 3;
+     string new_name = 4;
 }
 
 message Response {

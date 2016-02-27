@@ -24,7 +24,7 @@ class User(object):
 
 class Protocol(object):
     '''An abstract class representing a protocol'''
-    def __init__(self, port):
+    def __init__(self, host, port):
         raise NotImplementedError
 
     # RUN

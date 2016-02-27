@@ -1,13 +1,9 @@
 import curses
-import sys
-import random
+import thread
 import time
+
 from frontend.display import DisplayScreen
 from frontend.inputw import InputWindow
-import os
-
-import thread
-
 from protocols import Message
 
 class LoginUser(object):
@@ -81,7 +77,6 @@ class Application(object):
         input_window.box()
         self.display = DisplayScreen(display_window)
         self.input_w = InputWindow(input_window)
-        # self.screen.move(height-8, 1)
         input_window.move(0, 0)
         self.P = protocol
 
@@ -179,7 +174,7 @@ class Application(object):
                             self.addCmdLine("\t" + line)
             elif cmd_args[0] == "login":
                 if self.current_user is not None:
-                    self.addCmdLine("Cannot create a user while logged in")
+                    self.addCmdLine("Yo! You are already logged in as %s" % self.current_user.username)
                     return
                 username = cmd_args[1]
                 users = self.P.list_accounts(username)
@@ -221,7 +216,7 @@ class Application(object):
                 if response is not None:
                     self.addCmdLine("Created group %s" % cmd_args[1])
                 else:
-                    self.addCmdLine("Could not create account")
+                    self.addCmdLine("Could not create group: %s" % response)
             elif cmd_args[0] == "add-group-member":
                 response = self.P.add_group_member(cmd_args[1], cmd_args[2])
                 if response is None:

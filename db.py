@@ -3,7 +3,6 @@ This file contains all functions necessary for the server to interface with the 
 '''
 
 import sqlite3
-import threading
 
 def thread_safe(fn):
     '''Wraps db functions to be thread-safe (i.e. per thread connections)'''
@@ -22,7 +21,7 @@ def thread_safe(fn):
 
 class DBManager(object):
     def __init__(self):
-        self.lock = threading.Lock()
+        pass
 
     # Note that although this function appears to take conn and c as arguments,
     # because of the decorator, we don't need to pass these arguments in

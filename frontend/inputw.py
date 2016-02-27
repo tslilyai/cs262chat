@@ -1,7 +1,4 @@
 import curses
-import sys
-import random
-import time
 
 class InputWindow(object):
     line = ""
@@ -15,7 +12,8 @@ class InputWindow(object):
     def putchar(self, c):
         if c == ord('\b') or c == curses.KEY_BACKSPACE or c == curses.KEY_DC or c == 127:
             self.line = self.line[:-1]
-            self.pos -= 1
+            if self.pos > 0:
+                self.pos -= 1
         elif c == curses.KEY_LEFT:
             if self.pos > 0:
                 self.pos -= 1

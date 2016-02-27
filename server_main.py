@@ -1,20 +1,25 @@
 '''
 The main function to start and run the server lives here!
 '''
-import sys
+import argparse
+
 from protobuf.protobuf_server import run as run_protobuf
-#import custom.custom_server 
 
 def main():
-    protocol = sys.argv[1]
-    print "protocol is", protocol
-    port = sys.argv[2]
+    parser = argparse.ArgumentParser(description='Chat client.')
+    parser.add_argument('--protocol', dest='protocol', action='store',
+            default='protobuf', help='Protocol to use (default=protobuf)')
+    parser.add_argument('--port', dest='port', action='store',
+            default='8080', help="Server's port (default=8080)")
+    args = parser.parse_args()
 
-    if protocol == "protobuf":
-        run_protobuf(port)
+    print "protocol is", args.protocol
+
+    if args.protocol == "protobuf":
+        run_protobuf(int(args.port))
         print "Running protobuf server"
-    if protocol == "custom":
-        custom_server.run(port)
+    elif args.protocol == "custom":
+        custom_server.run(int(args.port))
 
 if __name__ == '__main__':
     main()
