@@ -124,6 +124,10 @@ class Application(object):
                 elif c == self.ESC_KEY:
                     self.mode = -1
                     self.display.setLines(self.cmd_history, adjust=True)
+                elif curses.keyname(c) == '^U':
+                    self.display.pageup()
+                elif curses.keyname(c) == '^D':
+                    self.display.pagedown()
                 elif c == ord('\n'):
                     # Interpret command
                     if self.mode == -1:
@@ -165,6 +169,14 @@ class Application(object):
                     self.addCmdLine("Valid commands and usage:")
                     for line in self.usage.values():
                         self.addCmdLine("\t" + line)
+                    self.addCmdLine('Shortcuts:')
+                    self.addCmdLine('\tCTRL-a: move cursor to start of line')
+                    self.addCmdLine('\tCTRL-e: move cursor to end of line')
+                    self.addCmdLine('\tCTRL-k: delete everything after cursor')
+                    self.addCmdLine('\tCTRL-u: page up')
+                    self.addCmdLine('\tCTRL-d: page down')
+                    self.addCmdLine('\tSHIFT-UP: previous command')
+                    self.addCmdLine('\tSHIFT-DOWN: next command')
                 else:
                     if cmd_args[0] in self.usage:
                         self.addCmdLine(self.usage[cmd_args[1]])
@@ -202,7 +214,7 @@ class Application(object):
             elif cmd_args[0] == "ls-groups":
                 response = self.P.list_groups() if len(cmd_args) == 1 else self.P.list_groups(cmd_args[1])
                 for group in response:
-                    self.addCmdLine("Group Name: %s\t Group ID: %d" % (group.gname, group.g_id))
+                    self.addCmdLine("Group Name: %s\t Group ID: %d" % (group.g_name, group.g_id))
             elif cmd_args[0] == "ls-users":
                 response = self.P.list_accounts() if len(cmd_args) == 1 else self.P.list_accounts(cmd_args[1])
                 for user in response:

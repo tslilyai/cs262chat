@@ -51,11 +51,16 @@ class DisplayScreen:
         self.screen.refresh()
 
     def updown(self, increment):
-        with open('log.txt', 'a') as f:
-            f.write('top: %d\n'% self.topLineNum)
         if increment == self.UP and self.topLineNum > 0:
             self.topLineNum += self.UP 
             return
         elif increment == self.DOWN and (self.topLineNum+self.screen.getmaxyx()[0]-1) < self.nOutputLines:
             self.topLineNum += self.DOWN
             return
+
+    def pageup(self):
+        self.topLineNum = max(0, self.topLineNum - (self.screen.getmaxyx()[0]-1))
+
+    def pagedown(self):
+        self.topLineNum = min(max(0, self.nOutputLines - self.screen.getmaxyx()[0] + 1),
+                self.topLineNum + (self.screen.getmaxyx()[0]-1))
