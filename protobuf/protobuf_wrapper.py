@@ -78,7 +78,7 @@ class Protobuf_Protocol(Protocol):
         return [Group(g.g_id, g.g_name) for g in groups]
     def list_accounts(self, pattern):
         pattern = obj.Pattern(pattern=pattern) 
-        users = self.Stub.rpc_list_users(pattern, _TIMEOUT_SECONDS)
+        users = self.Stub.rpc_list_accounts(pattern, _TIMEOUT_SECONDS)
         return [User(u.u_id, u.username) for u in users]
     def list_group_members(self, groupname):
         group = obj.Group(

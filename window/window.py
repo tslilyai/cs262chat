@@ -19,12 +19,13 @@ class LoginUser(object):
         self.formatted_messages = {}
 
     def add_message(self, message):
-        if to_id not in self.messages:
+        if message.to_id not in self.messages:
             self.messages[message.to_id] = []
-            self.formatted_messages = {}
+            self.formatted_messages[message.to_id] = []
         self.messages[message.to_id].append(message)
         self.formatted_messages[message.to_id].append(
             '%s: %s' % (message.from_name, message.msg))
+        self.checkpoint = message.m_id
 
 # When you enter conversation mode,
 # call setLines(self.current_user.formatted_messages[self.mode])
@@ -50,18 +51,6 @@ class Application(object):
             "remove-group-member" : 2,
             "talk-with" : 2,
             "logout" : 0
-    }
-    valid_cmds = {
-            "login",
-            "mk-user",
-            "ls-groups",
-            "ls-users",
-            "ls-group-members",
-            "mk-user",
-            "add-group-member",
-            "remove-group-member",
-            "talk-with",
-            "logout"
     }
     usage = {
             "login [username]",
@@ -100,11 +89,12 @@ class Application(object):
                 time.sleep(delay)
                 if self.current_user is None:
                     continue
-                msgs = self.P.fetch_messages(self.current_user.u_id, checkpoint)
+                msgs = self.P.fetch_messages(self.current_user.u_id, self.current_user.checkpoint)
                 # TODO: concurrency
                 for m in msgs:
                     self.current_user.add_message(m)
-                self.displayScreen()
+                if self.mode != -1:
+                    self.displayScreen()
         except KeyboardInterrupt:
             return
         
@@ -112,34 +102,34 @@ class Application(object):
         thread.start_new_thread(self.poll_for_messages, tuple())
         while True:
             assert not curses.isendwin()
-            try:
-                self.displayScreen()
-                # get user command
-                c = self.screen.getch()
-                with open ("log.txt", "a") as f:
-                    f.write("Read %d\n" % c)
-                if c == curses.KEY_UP: 
-                    self.display.updown(self.UP)
-                elif c == curses.KEY_DOWN:
-                    self.display.updown(self.DOWN)
-                elif c == self.ESC_KEY:
-                    self.mode = -1
-                elif c == ord('\n'):
-                    # Interpret command
-                    if self.mode == -1:
-                        self.display.setLines(self.cmd_history)
-                        self.execute_cmd(self.input_w.line)
-                    else:
-                        self.display.setLines(self.current_user.formatted_messages)
-                        self.P.send_message(from_name=current_user.username,
-                                            dest_id=self.mode,
-                                            msg=self.input_w.line)
-                    self.input_w.clearLine()
+            if self.mode == -1:
+                self.display.setLines(self.cmd_history)
+            else:
+                with open('log.txt', 'a') as f:
+                    f.write('Mode: %s\n' % self.mode)
+                self.display.setLines(self.current_user.formatted_messages[self.mode])
+            self.displayScreen()
+            # get user command
+            c = self.screen.getch()
+            if c == curses.KEY_UP: 
+                self.display.updown(self.UP)
+            elif c == curses.KEY_DOWN:
+                self.display.updown(self.DOWN)
+            elif c == self.ESC_KEY:
+                self.mode = -1
+            elif c == ord('\n'):
+                # Interpret command
+                if self.mode == -1:
+                    self.display.setLines(self.cmd_history)
+                    self.execute_cmd(self.input_w.line)
                 else:
-                    self.input_w.putchar(c)
-            except Exception as e:
-                with open ("log.txt", "a") as f:
-                    f.write("CRASHED %s\n" % e)
+                    self.display.setLines(self.current_user.formatted_messages)
+                    self.P.send_message(from_name=current_user.username,
+                                        dest_id=self.mode,
+                                        msg=self.input_w.line)
+                self.input_w.clearLine()
+            else:
+                self.input_w.putchar(c)
 
     def displayScreen(self):
         self.display.displayScreen()
@@ -149,18 +139,15 @@ class Application(object):
         self.cmd_history.append(line)
 
     def execute_cmd(self, cmd):
-        cmd_args = cmd.strip().split()[0]
-        is_valid = cmd_args[0] in self.valid_cmds and self.num_args[cmd_args[0]] == len(cmd_args[1:])
-        if not is_valid_cmd:
+        # add the cmd to the outputLines
+        cmd_args = cmd.strip().split()
+        self.addCmdLine(self.prompt + cmd)
+        is_valid = cmd_args[0] in self.num_args and self.num_args[cmd_args[0]] == len(cmd_args[1:])
+        if not is_valid:
             self.addCmdLine("Invalid Command! Valid commands and usage:")
-            for line in usage:
+            for line in self.usage:
                 self.addCmdLine("\t" + line)
         else:
-            # add the cmd to the outputLines
-            cmd_line = prompt
-            for arg in cmd_args:
-                cmd_line += args + " "
-            self.addCmdLine(cmd_line)
             
             # execute the cmd
             if cmd_args[0] == "login":
