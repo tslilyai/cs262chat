@@ -41,6 +41,7 @@ class Application(object):
     prompt = "> "
 
     num_args = {
+            "help" : {0, 1},
             "login" : {1},
             "mk-user" : {1},
             "ls-groups" : {0, 1},
@@ -53,17 +54,17 @@ class Application(object):
             "logout" : {0},
     }
     usage = {
-            "login [username]",
-            "mk-user [username]",
-            "ls-groups [pattern (optional)]*",
-            "ls-users [pattern (optional)]*",
-            "ls-group-members [g_name]*",
-            "mk-group [g_name]*",
-            "add-group-member [g_name] [username]*",
-            "remove-group-member [g_name] [username]*",
-            "talk-with [group/user] [group or user name]*",
-            "logout*",
-            "*must be logged in"
+            'login': "login [username]",
+            'mk_user': "mk-user [username]",
+            'ls-groups': "ls-groups [pattern (optional)]*",
+            'ls-users': "ls-users [pattern (optional)]*",
+            'ls-group-members': "ls-group-members [g_name]*",
+            'mk-group': "mk-group [g_name]*",
+            'add-group-member': "add-group-member [g_name] [username]*",
+            'remove-group-member': "remove-group-member [g_name] [username]*",
+            'talk-with': "talk-with [group/user] [group or user name]*",
+            'logout': "logout*",
+            '': "*must be logged in"
     } 
 
     def __init__(self, screen, protocol):
@@ -107,6 +108,8 @@ class Application(object):
         
     def run(self):
         thread.start_new_thread(self.poll_for_messages, tuple())
+        self.addCmdLine("Welcome to Chat!")
+        self.addCmdLine("Login to start chatting, or type help to get a list of valid commands.")
         while True:
             try:
                 assert not curses.isendwin()
@@ -151,16 +154,30 @@ class Application(object):
     def execute_cmd(self, cmd):
         # add the cmd to the outputLines
         cmd_args = cmd.strip().split()
+        if not cmd_args:
+            return
         self.addCmdLine(self.prompt + cmd)
         is_valid = cmd_args[0] in self.num_args and len(cmd_args[1:]) in self.num_args[cmd_args[0]] 
         if not is_valid:
             self.addCmdLine("Invalid Command! Valid commands and usage:")
-            for line in self.usage:
+            for line in self.usage.values():
                 self.addCmdLine("\t" + line)
         else:
             
             # execute the cmd
-            if cmd_args[0] == "login":
+            if cmd_args[0] == "help":
+                if len(cmd_args) == 1:
+                    self.addCmdLine("Valid commands and usage:")
+                    for line in self.usage.values():
+                        self.addCmdLine("\t" + line)
+                else:
+                    if cmd_args[0] in self.usage:
+                        self.addCmdLine(self.usage[cmd_args[1]])
+                    else:
+                        self.addCmdLine("%s is not a valid commands. Valid commands and usage:" % cmd_args[1])
+                        for line in self.usage.values():
+                            self.addCmdLine("\t" + line)
+            elif cmd_args[0] == "login":
                 if self.current_user is not None:
                     self.addCmdLine("Cannot create a user while logged in")
                     return
