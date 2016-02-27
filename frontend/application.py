@@ -71,64 +71,73 @@ class Application(object):
         curses.noecho()
         curses.cbreak()
         self.screen.keypad(1) 
-        self.screen.border(0)
 
+        self.screen.border(0)
         height, width = self.screen.getmaxyx()
         display_window = curses.newwin(height - 10, width, 1, 1)
-        input_window = curses.newwin(5, width, height-10, 1)
+        display_window.box()
+        input_window = curses.newwin(9, width, height-10, 1)
+        input_window.box()
         self.display = DisplayScreen(display_window)
         self.input_w = InputWindow(input_window)
+        self.screen.move(height-8, 1)
         self.P = protocol
 
         self.current_user = None
         self.mode = -1
+        self.exited = False
+        self.screen.refresh()
+        display_window.refresh()
+        input_window.refresh()
 
     def poll_for_messages(self, delay = 1):
-        try:
-            while(1):
-                time.sleep(delay)
-                if self.current_user is None:
-                    continue
-                msgs = self.P.fetch_messages(self.current_user.u_id, self.current_user.checkpoint)
-                # TODO: concurrency
-                for m in msgs:
-                    self.current_user.add_message(m)
-                if self.mode != -1:
-                    self.display.setLines(self.current_user.formatted_messages[self.mode])
+        while not self.exited:
+            time.sleep(delay)
+            if self.current_user is None:
+                continue
+            msgs = self.P.fetch_messages(self.current_user.u_id, self.current_user.checkpoint)
+            # TODO: concurrency
+            for m in msgs:
+                self.current_user.add_message(m)
+            if self.mode != -1:
+                # This setLines is necessary since in Python, an empty list and a nonempty list will point to different objects in memory
+                self.display.setLines(self.current_user.formatted_messages[self.mode])
                 self.displayScreen()
-        except KeyboardInterrupt:
-            return
         
     def run(self):
         thread.start_new_thread(self.poll_for_messages, tuple())
         while True:
-            assert not curses.isendwin()
-            if self.mode == -1:
-                self.display.setLines(self.cmd_history)
-            else:
-                if self.mode not in self.current_user.formatted_messages:
-                    self.current_user.formatted_messages[self.mode] = []
-                self.display.setLines(self.current_user.formatted_messages[self.mode])
-            self.displayScreen()
-            # get user command
-            c = self.screen.getch()
-            if c == curses.KEY_UP: 
-                self.display.updown(self.UP)
-            elif c == curses.KEY_DOWN:
-                self.display.updown(self.DOWN)
-            elif c == self.ESC_KEY:
-                self.mode = -1
-            elif c == ord('\n'):
-                # Interpret command
+            try:
+                assert not curses.isendwin()
                 if self.mode == -1:
-                    self.execute_cmd(self.input_w.line)
+                    self.display.setLines(self.cmd_history)
                 else:
-                    self.P.send_message(from_name=self.current_user.username,
-                                        dest_id=self.mode,
-                                        msg=self.input_w.line)
-                self.input_w.clearLine()
-            else:
-                self.input_w.putchar(c)
+                    if self.mode not in self.current_user.formatted_messages:
+                        self.current_user.formatted_messages[self.mode] = []
+                    self.display.setLines(self.current_user.formatted_messages[self.mode])
+                self.displayScreen()
+                # get user command
+                c = self.screen.getch()
+                if c == curses.KEY_UP: 
+                    self.display.updown(self.UP)
+                elif c == curses.KEY_DOWN:
+                    self.display.updown(self.DOWN)
+                elif c == self.ESC_KEY:
+                    self.mode = -1
+                elif c == ord('\n'):
+                    # Interpret command
+                    if self.mode == -1:
+                        self.execute_cmd(self.input_w.line)
+                    else:
+                        self.P.send_message(from_name=self.current_user.username,
+                                            dest_id=self.mode,
+                                            msg=self.input_w.line)
+                    self.input_w.clearLine()
+                else:
+                    self.input_w.putchar(c)
+            except KeyboardInterrupt as e:
+                self.exited = True
+                raise e
 
     def displayScreen(self):
         self.display.displayScreen()

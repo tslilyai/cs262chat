@@ -50,6 +50,10 @@ Escape thread mode back to command mode simply by typing ESC.
     
     *must be logged in
 
+### Patterns
+
+
+
 # Communication Protocols API
 This interface should be implemented by any protocol used by the chat server.
 

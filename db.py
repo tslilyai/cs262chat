@@ -6,6 +6,7 @@ import sqlite3
 import threading
 
 def thread_safe(fn):
+    '''Wraps db functions to be thread-safe (i.e. per thread connections)'''
     def new_fn(self, *args, **kwargs):
         conn = sqlite3.connect('chatapp.db')
         c = conn.cursor()
@@ -27,6 +28,7 @@ class DBManager(object):
     # because of the decorator, we don't need to pass these arguments in
     @thread_safe
     def create_tables(self, conn, c):
+        '''void create_tables(self): creates database tables for the app'''
         c.execute("""
             CREATE TABLE users (u_id int NOT NULL PRIMARY KEY, username varchar(255) UNIQUE)
         """)
@@ -46,6 +48,10 @@ class DBManager(object):
 
     @thread_safe
     def get_or_create_vgid(self, conn, c, to_id, from_id):
+        '''
+        int get_or_create_vgid(self, int to_id, int from_id):
+            returns the vgroup id for users to_id and from_id. Creates vgroup if it doesn't exist.
+        '''
         c.execute("SELECT g_id FROM vgroups WHERE (id1 = ? AND id2 = ?) OR (id2 = ? AND id1 = ?)",
                       [to_id, from_id, to_id, from_id])
         v = c.fetchone()
@@ -68,6 +74,12 @@ class DBManager(object):
 
     @thread_safe
     def insert_message(self, conn, c, to_id, from_id, msg):
+        '''
+        void insert_message(int to_id, int from_id, string msg):
+            creates a new message from from_id to to_id with content msg.
+            from_id is the id of a user.
+            to_id is the id of a group or vgroup.
+        '''
         if len(msg) > 1023:
             raise Exception('Message string too long')
 
@@ -88,8 +100,12 @@ class DBManager(object):
         conn.commit()
 
     @thread_safe
-    def get_user_id(self, conn, c, uname):
-        c.execute("SELECT u_id FROM users WHERE username=?", [uname])
+    def get_user_id(self, conn, c, u_name):
+        '''
+        int get_user_id(string u_name):
+            returns the user id for user with username u_name
+        '''
+        c.execute("SELECT u_id FROM users WHERE username=?", [u_name])
         v = c.fetchone()
         if v is None:
             raise Exception('User does not exist')
@@ -98,6 +114,10 @@ class DBManager(object):
 
     @thread_safe
     def get_group_id(self, conn, c, g_name):
+        '''
+        int get_group_id(string g_name):
+            returns the group id for group with name g_name
+        '''
         c.execute("SELECT g_id FROM groups WHERE g_name=?", [g_name])
         v = c.fetchone()
         if v is None:
@@ -107,6 +127,12 @@ class DBManager(object):
 
     @thread_safe
     def get_messages(self, conn, c, u_id, checkpoint=0):
+        '''
+        messages[] get_messages(int u_id, int checkpoint):
+            returns a list of dictionaries representing messages (fields m_id, to_id, from_name, msg)
+            that the user with id u_id could see.
+            All returned messages have id greater than checkpoint.
+        '''
         c.execute("""
             SELECT messages.m_id, messages.to_id, messages.from_id, messages.msg
                 FROM messages INNER JOIN user_group_pairs ON
@@ -129,6 +155,10 @@ class DBManager(object):
 
     @thread_safe
     def create_group(self, conn, c, g_name):
+        '''
+        void create_group(string g_name):
+            creates a group with name g_name.
+        '''
         c.execute("SELECT g_id FROM groups ORDER BY g_id DESC LIMIT 1")
         v = c.fetchone()
         if v is None:
@@ -145,6 +175,7 @@ class DBManager(object):
         conn.commit()
 
     def _insert_ugpair(self, conn, c, u_id, g_id):
+        # helper function for associating user with group
         c.execute("SELECT _id FROM user_group_pairs ORDER BY _id DESC LIMIT 1")
         npairs = c.fetchone()
         if npairs is None:
@@ -159,7 +190,11 @@ class DBManager(object):
                        """, [npairs + 1, u_id, g_id])
 
     @thread_safe
-    def create_account(self, conn, c, uname):
+    def create_account(self, conn, c, u_name):
+        '''
+        void create_account(string u_name):
+            creates a new user with username u_name
+        '''
         print "selecting"
         c.execute("SELECT u_id FROM users ORDER BY u_id DESC LIMIT 1")
         v = c.fetchone()
@@ -174,15 +209,19 @@ class DBManager(object):
                        (u_id, username)
                        VALUES
                        (?, ?)
-                       """, [v + 2, uname])
+                       """, [v + 2, u_name])
 
         print "done creating account"
         conn.commit()
         print "committed"
 
     @thread_safe
-    def add_group_member(self, conn, c, g_name, uname):
-        c.execute("SELECT u_id FROM users WHERE username=?", [uname])
+    def add_group_member(self, conn, c, g_name, u_name):
+        '''
+        void add_group_member(string g_name, string u_name):
+            adds user with username u_name to group with name g_name
+        '''
+        c.execute("SELECT u_id FROM users WHERE username=?", [u_name])
         u_id = c.fetchone()
         if u_id is None:
             raise Exception('User does not exist')
@@ -207,8 +246,12 @@ class DBManager(object):
 
 
     @thread_safe
-    def remove_account(self, conn, c, uname):
-        c.execute("SELECT u_id FROM users WHERE username=?", [uname])
+    def remove_account(self, conn, c, u_name):
+        '''
+        void remove_account(string u_name):
+            Delete user with username u_name
+        '''
+        c.execute("SELECT u_id FROM users WHERE username=?", [u_name])
         v = c.fetchone()
         if v is None:
             raise Exception("Deleted user doesn't exit")
@@ -220,8 +263,12 @@ class DBManager(object):
         conn.commit()
 
     @thread_safe
-    def remove_group_member(self, conn, c, g_name, uname):
-        c.execute("SELECT u_id FROM users WHERE username=?", [uname])
+    def remove_group_member(self, conn, c, g_name, u_name):
+        '''
+        void remove_group_member(string g_name, string u_name):
+            Delete user with username u_name from group with name g_name
+        '''
+        c.execute("SELECT u_id FROM users WHERE username=?", [u_name])
         uid = c.fetchone()
         if uid is None:
             raise Exception("User doesn't exist")
@@ -240,11 +287,20 @@ class DBManager(object):
 
     @thread_safe
     def edit_group_name(self, conn, c, g_name, newname):
+        '''
+        void edit_group_name(string name, string newname):
+            changes name of group with name g_name to newname
+        '''
         c.execute("UPDATE groups SET g_name=? WHERE g_name=?", [newname, g_name])
         conn.commit()
 
     @thread_safe
     def get_groups(self, conn, c, pattern):
+        '''
+        list(group) get_groups(string pattern):
+            returns a list of groups whose names matches pattern.
+            pattern is specified in SQL pattern syntax.
+        '''
         c.execute("SELECT g_id, g_name FROM groups WHERE g_name LIKE ?", [pattern])
         groups = c.fetchall()
         if groups is None:
@@ -253,6 +309,11 @@ class DBManager(object):
 
     @thread_safe
     def get_accounts(self, conn, c, pattern):
+        '''
+        list(user) get_accounts(string pattern):
+            returns a list of users whose usernames matches pattern.
+            pattern is specified in SQL pattern syntax.
+        '''
         c.execute("SELECT u_id, username FROM users WHERE username LIKE ? ORDER BY u_id ASC", [pattern])
         users = c.fetchall()
         if users is None:
@@ -261,6 +322,10 @@ class DBManager(object):
 
     @thread_safe
     def get_group_members(self, conn, c, g_name):
+        '''
+        list(user) get_group_members(string g_name):
+            returns a list of users belong to group with name g_name
+        '''
         c.execute("""
             SELECT users.u_id, users.username FROM
                 users INNER JOIN user_group_pairs ON users.u_id=user_group_pairs.u_id
