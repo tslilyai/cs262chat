@@ -30,7 +30,7 @@ class Protobuf_Protocol(Protocol):
             from_name = from_name,
             msg = msg
         )
-        return self.__get_response(self.Stub.rpc_send_individual_message(message, _TIMEOUT_SECONDS))
+        return self.__get_response(self.Stub.rpc_send_message(message, _TIMEOUT_SECONDS))
 
     def fetch_messages(self, to_id, checkpoint=0):
         user = obj.User(

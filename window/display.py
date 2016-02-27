@@ -45,6 +45,8 @@ class DisplayScreen:
 
     def setLines(self, lines):
         self.outputLines = lines
+        self.topLineNum = 0
+        self.displayScreen()
 
     def getOutputLines(self):
         self.nOutputLines = len(self.outputLines)
