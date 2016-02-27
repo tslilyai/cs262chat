@@ -53,56 +53,58 @@ Escape thread mode back to command mode simply by typing ESC.
 ### Patterns
 
 A highly sophisticated pattern matching language:
+
 	% matches 0 or more characters
 	_ matches exactly one character
 	[charset] matches sets or ranges of characters
 	[^charset] matches the complement of a set or range of characters
+
 Coincidentally, this language is also used in the SQL like query: http://www.w3schools.com/sql/sql_wildcards.asp. And when you sanitize SQL queries, these strings are unmodified.
 
 # Communication Protocols API
 This interface should be implemented by any protocol used by the chat server.
 
-    def client_run(username, port)
+    def client_run(port)
 
 ### MESSAGING 
+    def send_message(self, from_name, dest_id, msg):
+        '''Returns None on success, or an error string'''
     
-    # returns a success or error message string
-    def send_individual_message(self, src="", dest="", msg="")
-    
-    # returns a success or error message string
-    def send_group_message(self, src="", dest="", msg="")
-    
-    # returns a list of (from, msg) string tuples
-    def get_messages(self, dest="")
-
+    def fetch_messages(self, to_id, checkpoint=0):
+        '''Returns a list of Messages addressed to to_id'''
+        
 ###CREATION AND DELETION 
     
-    # returns a success or error message string
-    # only creates an empty group
-    def create_group(self, groupname="")
+    def create_group(self, g_name=""):
+        '''Returns a Group object with g_name=g_name'''
     
-    # returns a success or error message string
-    def create_account(self, username="")
+    def create_account(self, username=""):
+        '''Returns a User object with username=username'''
     
-    # returns a success or error message string
-    def remove_account(self, username="")
+    def remove_account(self, username=""):
+        '''Returns None or error string'''
 
 ###GROUPS 
     
-    # returns a success or error message string
-    def edit_group_name(self, old_name="", new_name="")
-    # returns a success or error message string
-    def remove_group_member(self, groupname="", membername="")
-    # returns a success or error message string
-    def add_group_member(self, groupname="", membername="")
+    def edit_group_name(self, old_name="", new_name=""):
+        '''Returns None or error string'''
+    
+    def remove_group_member(self, g_name="", membername=""):
+        '''Returns None or error string'''
+   
+    def add_group_member(self, g_name="", membername=""):
+        '''Returns None or error string'''
 
 ### LISTING 
     
-    # returns a list of strings
-    def list_groups(self, pattern="%")
-    def list_accounts(self, pattern="%")
-    def list_group_members(self, groupname="")
-
+    def list_groups(self, pattern="%"):
+        '''Returns a list of Group objects (empty list if none match)'''
+    
+    def list_accounts(self, pattern="%"):
+        '''Returns a list of User objects (empty list if none match)'''
+   
+    def list_group_members(self, g_name=""):
+        '''Returns a list of User objects (empty list if none)'''
 
 # Database API 
         void create_tables(self): creates database tables for the app
