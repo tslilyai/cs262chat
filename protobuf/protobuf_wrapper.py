@@ -40,6 +40,14 @@ class Protobuf_Protocol(Protocol):
         messages = self.Stub.rpc_get_messages(user, _TIMEOUT_SECONDS)
         return [Message(m.m_id, m.from_name, m.to_id, m.msg) for m in messages]
 
+    def create_conversation(self, username1, username2):
+        user_pair = obj.UserPair(
+            username1=username1,
+            username2=username2
+        )
+        group = self.Stub.rpc_create_conversation(user_pair, _TIMEOUT_SECONDS)
+        return group.g_id
+
     # CREATION AND DELETION 
     def create_group(self, groupname):
         group = obj.Group(g_name = groupname)

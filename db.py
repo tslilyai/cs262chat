@@ -123,46 +123,25 @@ class DBManager(object):
         return v[0]
 
     @thread_safe
-    def get_messages(self, conn, c, u_id):
+    def get_messages(self, conn, c, u_id, checkpoint=0):
         c.execute("""
             SELECT messages.m_id, messages.to_id, messages.from_id, messages.msg
                 FROM messages INNER JOIN user_group_pairs ON
                     messages.to_id=user_group_pairs.g_id
-                WHERE user_group_pairs.u_id=?
+                WHERE user_group_pairs.u_id=? AND messages.m_id>?
                 ORDER BY messages.m_id ASC
-            """, [u_id])
+            """, [u_id, checkpoint])
         rows = c.fetchall()
         if rows is None:
             raise Exception('No messages')
         answers = []
         for row in rows:
-            if row[1] % 2 == 0:
-                c.execute("""
-                    SELECT users.u_id, users.username FROM users
-                        INNER JOIN user_group_pairs ON
-                            user_group_pairs.u_id=users.u_id
-                        WHERE user_group_pairs.g_id=?""", [row[1]])
-                unames = c.fetchall()
-                if unames is None or len(unames) != 2:
-                    raise Exception('To user does not exist')
-                if unames[0][0] == row[2]:
-                    from_name = unames[0][1]
-                    to_name = unames[1][1]
-                else:
-                    from_name = unames[1][1]
-                    to_name = unames[0][1]
-            else:
-                c.execute("SELECT gname FROM groups WHERE g_id=?", [row[1]])
-                group = c.fetchone()
-                if group is None:
-                    raise Exception('To group does not exist')
-                to_name = group[0]
-                c.execute("SELECT username FROM users WHERE u_id=?", [row[2]])
-                user = c.fetchone()
-                if user is None:
-                    raise Exception('To group does not exist')
-                from_name = user[0]
-            answers.append({'m_id': row[0], 'to_name': to_name, 'from_name': from_name, 'msg': row[3], 'group_id': row[1]})
+            c.execute("SELECT username FROM users WHERE u_id=?", [row[2]])
+            user = c.fetchone()
+            if user is None:
+                raise Exception('From user does not exist')
+            from_name = user[0]
+            answers.append({'m_id': row[0], 'to_id': row[1], 'from_name': from_name, 'msg': row[3]})
         return answers
 
     @thread_safe
