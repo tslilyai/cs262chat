@@ -2,8 +2,8 @@ import curses
 import sys
 import random
 import time
-from display import DisplayScreen
-from inputw import InputWindow
+from frontend.display import DisplayScreen
+from frontend.inputw import InputWindow
 import os
 
 import thread
@@ -80,7 +80,8 @@ class Application(object):
         input_window.box()
         self.display = DisplayScreen(display_window)
         self.input_w = InputWindow(input_window)
-        self.screen.move(height-8, 1)
+        # self.screen.move(height-8, 1)
+        input_window.move(0, 0)
         self.P = protocol
 
         self.current_user = None
@@ -124,6 +125,7 @@ class Application(object):
                     self.display.updown(self.DOWN)
                 elif c == self.ESC_KEY:
                     self.mode = -1
+                    self.display.setLines(self.cmd_history, adjust=True)
                 elif c == ord('\n'):
                     # Interpret command
                     if self.mode == -1:
@@ -233,4 +235,4 @@ class Application(object):
                         self.addCmdLine("Group %s does not exist." % to_name)
                     else:
                         self.mode = int(groups[0].g_id)
-                self.displayScreen()
+                self.display.setLines(self.cmd_history, adjust=True)

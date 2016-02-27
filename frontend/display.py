@@ -22,30 +22,20 @@ class DisplayScreen:
         self.screen = window
         self.screen.border(0)
         self.topLineNum = 0
-        self.highlightLineNum = 0
         self.markedLineNums = []
         self.getOutputLines()        
 
-        '''
-        # thread that just adds lines
-        def add_lines(v):
-            i=0
-            while(1):
-                i+=1
-                try:
-                    self.addOutputLine("this is line %d" % i)
-                except KeyboardInterrupt:
-                    exit(0)
-                except Exception as e:
-                    with open ("log.txt", "a") as f:
-                        f.write("CRASHED %s\n" % e)
-                time.sleep(.1)
-        thread.start_new_thread(add_lines, ("this is a line\n",))
-        '''
 
-    def setLines(self, lines):
+    def setLines(self, lines, adjust=False):
+        was_last_page = self.topLineNum + self.screen.getmaxyx()[0] >= self.nOutputLines + 1
         self.outputLines = lines
-        self.topLineNum = 0
+        self.nOutputLines = len(lines)
+        if adjust:
+            self.topLineNum = max(0, self.nOutputLines - self.screen.getmaxyx()[0] + 1)
+        else:
+            if was_last_page:
+                self.topLineNum = max(0, self.nOutputLines - self.screen.getmaxyx()[0] + 1)
+
         self.displayScreen()
 
     def getOutputLines(self):
@@ -53,8 +43,8 @@ class DisplayScreen:
 
     def addOutputLine(self, line):
         self.outputLines.append(line)
-        self.nOutputLines+=1
-        if self.nOutputLines >= self.screen.getmaxyx()[0]:
+        self.nOutputLines += 1
+        if self.topLineNum + self.screen.getmaxyx()[0] == self.nOutputLines:
             self.topLineNum+=1
         self.displayScreen()
 
@@ -67,27 +57,15 @@ class DisplayScreen:
         bottom = self.topLineNum+self.screen.getmaxyx()[0]
         for (index,line,) in enumerate(self.outputLines[top:bottom]):
             linenum = self.topLineNum + index
-
-            # highlight current line            
-            if index != self.highlightLineNum:
-                self.screen.addstr(index, 0, line)
-            else:
-                self.screen.addstr(index, 0, line, curses.A_BOLD)
+            self.screen.addstr(index, 0, line)
         self.screen.refresh()
 
-    # move highlight up/down one line
     def updown(self, increment):
-        nextLineNum = self.highlightLineNum + increment
-        # paging
-        if increment == self.UP and self.highlightLineNum == 0 and self.topLineNum != 0:
+        with open('log.txt', 'a') as f:
+            f.write('top: %d\n'% self.topLineNum)
+        if increment == self.UP and self.topLineNum > 0:
             self.topLineNum += self.UP 
             return
-        elif increment == self.DOWN and nextLineNum == curses.LINES and (self.topLineNum+curses.LINES) != self.nOutputLines:
+        elif increment == self.DOWN and (self.topLineNum+self.screen.getmaxyx()[0]-1) < self.nOutputLines:
             self.topLineNum += self.DOWN
             return
-
-        # scroll highlight line
-        if increment == self.UP and (self.topLineNum != 0 or self.highlightLineNum != 0):
-            self.highlightLineNum = nextLineNum
-        elif increment == self.DOWN and (self.topLineNum+self.highlightLineNum+1) != self.nOutputLines and self.highlightLineNum != curses.LINES:
-            self.highlightLineNum = nextLineNum
