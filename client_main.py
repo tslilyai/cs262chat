@@ -15,6 +15,9 @@ from frontend.application import Application
 
 
 def main(screen):
+    if len(sys.argv) != 3:
+        print "Usage: python client_main.py [protobuf / custom] [port]"
+
     protocol = sys.argv[1]
     port = sys.argv[2]
     if protocol == 'protobuf':

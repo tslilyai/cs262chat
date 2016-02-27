@@ -73,7 +73,7 @@ class Protocol(object):
         raise NotImplementedError
 
     '''
-    GROUPS 
+    Listing 
     '''
     def list_groups(self, pattern="%"):
         '''Returns a list of Group objects (empty list if none match)'''
