@@ -61,12 +61,20 @@ class ProtobufServer(obj.BetaChatAppServicer):
     @list_to_protobuf(obj.CMessage)
     def rpc_get_messages(self, request, context):
         try:
-            u_id = self.db.get_user_id(request.username)
-            msgs = self.db.get_messages(u_id)
+            msgs = self.db.get_messages(request.u_id, request.checkpoint)
         except Exception as e:
             # return a dummy message if getting messages failed
-            return [{'m_id': 0, 'to_name': 'NULL', 'from_name': 'NULL', 'msg': 'Could not retrieve messages :%s\n' % e}]
+            return []
+        # {'m_id': 0, 'to_name': 'NULL', 'from_name': 'NULL', 'msg': 'Could not retrieve messages :%s\n' % e}]
         return msgs
+
+    @add_logging
+    def rpc_create_conversation(self, request, context):
+        try:
+            u1 = self.db.get_user_id(request.username1)
+            u2 = self.db.get_user_id(request.username2)
+            gid = self.db.get_or_create_vgid(u1, u2)
+            return obj.Group(g_id=gid)
 
     @add_logging
     def rpc_create_group(self, request, context):

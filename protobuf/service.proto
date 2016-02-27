@@ -6,6 +6,7 @@ service ChatApp {
     rpc rpc_send_individual_message(CMessage) returns (Response) {}
     rpc rpc_send_group_message(CMessage) returns (Response) {}
     rpc rpc_get_messages(User) returns (stream CMessage) {}
+    rpc rpc_create_conversation(UserPair) returns (Group) {}
     rpc rpc_create_group(Group) returns (Response) {}
     rpc rpc_create_account(User) returns (Response) {}
     rpc rpc_remove_account(User) returns (Response) {}
@@ -22,20 +23,25 @@ message CMessage {
      int64 to_id = 2;
      string from_name = 3;
      string msg = 4;
-     int64 group_id = 5;
 }
 
 message User {
      int64 u_id = 1;
      string username = 2;
      string password = 3;
+     int64 checkpoint = 4;
+}
+
+message UserPair {
+    string username1;
+    string username2;
 }
 
 message Group {
-    int64 g_id = 1;
+     int64 g_id = 1;
      string g_name = 2;
-    repeated int64 member_ids = 3;
-    string edit_member_name = 4;
+//   repeated int64 member_ids = 3;
+     string edit_member_name = 4;
      string new_name = 5;
 }
 
