@@ -41,6 +41,7 @@ Escape thread mode back to command mode simply by typing ESC.
 
     > login [username]
     > mk-user [username]
+    > delete-account
     > ls-groups [pattern (optional)]*
     > ls-users [pattern (optional)]*
     > ls-group-members [groupname]*
