@@ -194,7 +194,6 @@ class DBManager(object):
         void create_account(string u_name):
             creates a new user with username u_name
         '''
-        print "selecting"
         c.execute("SELECT u_id FROM users ORDER BY u_id DESC LIMIT 1")
         v = c.fetchone()
         if v is None:
@@ -202,7 +201,6 @@ class DBManager(object):
         else:
             v = v[0]
         assert (v % 2 == 0)
-        print "about to insert"
         c.execute("""
             INSERT INTO users 
                        (u_id, username)
@@ -210,9 +208,7 @@ class DBManager(object):
                        (?, ?)
                        """, [v + 2, u_name])
 
-        print "done creating account"
         conn.commit()
-        print "committed"
 
     @thread_safe
     def add_group_member(self, conn, c, g_name, u_name):
@@ -386,7 +382,8 @@ if __name__ == '__main__':
     assert tuple([r['username'] for r in res]) == ('ludwig', 'johann', 'wolfgang')
 
 
-    db.insert_message(db.get_user_id("tslilyai"),
+    vgid = db.get_or_create_vgid(db.get_user_id("tslilyai"), db.get_user_id("fding"))
+    db.insert_message(vgid,
                       db.get_user_id("fding"),
                       "Hi!")
 
