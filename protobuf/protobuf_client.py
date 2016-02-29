@@ -63,7 +63,7 @@ class ProtobufProtocol(Protocol):
             return User(new_user.u_id, new_user.username)
         else:
             return None
-    def remove_account(self):
+    def remove_account(self, username):
         user = obj.User(username=username)
         return self.__get_response(self.Stub.rpc_remove_account(user, _TIMEOUT_SECONDS))
 

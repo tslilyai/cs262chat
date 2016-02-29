@@ -40,6 +40,7 @@ class Application(object):
             "help" : {0, 1},
             "login" : {1},
             "mk-user" : {1},
+            "delete-account" : {0},
             "ls-groups" : {0, 1},
             "ls-users" : {0, 1},
             "ls-group-members" : {1},
@@ -52,6 +53,7 @@ class Application(object):
     usage = {
             'login': "login [username]",
             'mk_user': "mk-user [username]",
+            'delete-account': "delete-account",
             'ls-groups': "ls-groups [pattern (optional)]*",
             'ls-users': "ls-users [pattern (optional)]*",
             'ls-group-members': "ls-group-members [g_name]*",
@@ -239,6 +241,13 @@ class Application(object):
                 response = self.P.remove_group_member(cmd_args[1], cmd_args[2])
                 if response is None:
                     self.addCmdLine("Removed %s from group %s" % (cmd_args[2], cmd_args[1]))
+                else:
+                    self.addCmdLine(response)
+            elif cmd_args[0] == "delete-account":
+                response = self.P.remove_account(self.current_user.username)
+                self.current_user = None
+                if response is None:
+                    self.addCmdLine("Account Deleted")
                 else:
                     self.addCmdLine(response)
             elif cmd_args[0] == "logout":

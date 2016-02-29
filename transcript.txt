@@ -1,3 +1,18 @@
+mk-user fding
 login fding
 ls-users
-
+ls-groups
+mk-group cs262
+logout
+mk-user lily
+ls-users
+ls-groups cs%
+add-member cs262 lily
+add-member cs262 fding
+delete-account
+logout
+login fding
+talk-with group cs262
+hi i'm david!
+i like distributed systems!
+goodbye
