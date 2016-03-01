@@ -12,6 +12,7 @@ We support two types of communication protocols: `protocol` can be one of either
 
 - To start up a chat client (logged in as user `username`): `python client_main.py [--protocol protocol] [--port port] [--host host]`
 
+Before running the application, you will need to initialize the database.  This can be done using `python db.py init`.  To start out with some test users/groups, call `python db.py test`.  To remove all users, groups, and messages, call `python db.py clean`.
 
 # Front End 
 

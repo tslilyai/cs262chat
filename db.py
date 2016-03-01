@@ -3,6 +3,7 @@ This file contains all functions necessary for the server to interface with the 
 '''
 
 import sqlite3
+import sys
 
 def thread_safe(fn):
     '''Wraps db functions to be thread-safe (i.e. per thread connections)'''
@@ -42,6 +43,26 @@ class DBManager(object):
         """)
         c.execute("""
             CREATE TABLE messages (m_id int NOT NULL PRIMARY KEY, to_id int, from_id int, msg varchar(1023))
+        """)
+        conn.commit()
+
+    @thread_safe
+    def remove_tables(self, conn, c):
+        '''void create_tables(self): creates database tables for the app'''
+        c.execute("""
+            DROP TABLE users
+        """)
+        c.execute("""
+            DROP TABLE groups
+        """)
+        c.execute("""
+            DROP TABLE vgroups
+        """)
+        c.execute("""
+            DROP TABLE user_group_pairs
+        """)
+        c.execute("""
+            DROP TABLE messages
         """)
         conn.commit()
 
@@ -331,8 +352,7 @@ class DBManager(object):
             return []
         return [{'u_id': u[0], 'username': u[1]} for u in users]
 
-if __name__ == '__main__':
-    db = DBManager()
+def test(db):
     db.create_tables()
     db.create_account("fding")
     db.create_account("tslilyai")
@@ -440,3 +460,22 @@ if __name__ == '__main__':
     assert get_contents(msgs) == ('Hi!', 'lets pset')
 
     print 'Passed all tests'
+
+if __name__ == '__main__':
+    db = DBManager()
+
+    if len(sys.argv) == 2:
+        if sys.argv[1] == 'init':
+            db.create_tables()
+        elif sys.argv[1] == 'clean':
+            db.remove_tables()
+            db.create_tables()
+        elif sys.argv[1] == 'test':
+            db.remove_tables()
+            test(db)
+        else:
+            print 'Usage: db init|clean|test'
+    else:
+        db.create_tables()
+
+    
