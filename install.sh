@@ -14,6 +14,7 @@ sudo apt-get install python-all-dev python-virtualenv
 #####################################################
 sudo pip install protobuf==3.0.0b2
 sudo pip install grpcio
+sudo pip install requests
 
 #####################################################
 # Compilations from source

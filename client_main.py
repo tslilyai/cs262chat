@@ -7,7 +7,7 @@ import curses
 import os
 
 from frontend.application import Application
-from protobuf.protobuf_client import ProtobufProtocol
+#from protobuf.protobuf_client import ProtobufProtocol
 from custom.custom_client import CustomProtocol
 
 def main(screen):

@@ -38,13 +38,13 @@ class CustomProtocol(Protocol):
         ret = {}
         ret['action'] = action
         ret['version'] = _VERSION_NUMBER
-        if actor:
+        if actor != None:
             ret['actor'] = actor
-        if setting:
+        if setting != None:
             ret['setting'] = setting
-        if target:
+        if target != None:
             ret['target'] = target
-        if value:
+        if value != None:
             ret['value'] = value
         return ret
             
@@ -55,8 +55,6 @@ class CustomProtocol(Protocol):
             return TimeoutResponse()
     
     def __send_post(self, payload):
-        print self.url
-        print payload
         try:
             return requests.post(self.url, json.dumps(payload), timeout=_TIMEOUT_SECONDS)
         except Exception as e:
@@ -81,8 +79,8 @@ class CustomProtocol(Protocol):
     #   [ { m_id, from_name, to_id, msg }, ... ]
     def fetch_messages(self, to_id, checkpoint=0):
         payload = self.__create_object('messages-fetch', actor=to_id, setting=checkpoint)
-        #response = self.__send_get(payload)
-        response = TimeoutResponse()
+        response = self.__send_get(payload)
+        #response = TimeoutResponse()
         messages = []
         if response.status_code == requests.codes.ok:
             messages = response.json()

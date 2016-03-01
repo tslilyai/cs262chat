@@ -3,7 +3,7 @@ The main function to start and run the server lives here!
 '''
 import argparse
 
-from protobuf.protobuf_server import run as run_protobuf
+#from protobuf.protobuf_server import run as run_protobuf
 from custom.custom_server import run as run_custom
 
 def main():
@@ -17,7 +17,7 @@ def main():
     print "protocol is", args.protocol
 
     if args.protocol == "protobuf":
-        run_protobuf(int(args.port))
+        #run_protobuf(int(args.port))
         print "Running protobuf server"
     elif args.protocol == "custom":
         run_custom(int(args.port))
