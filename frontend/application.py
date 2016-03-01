@@ -144,6 +144,8 @@ class Application(object):
             except KeyboardInterrupt as e:
                 self.exited = True
                 raise e
+            except Exception as e:
+                pass
 
     def displayScreen(self):
         self.display.displayScreen()
