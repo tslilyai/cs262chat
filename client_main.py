@@ -8,10 +8,14 @@ import os
 
 from frontend.application import Application
 from protobuf.protobuf_client import ProtobufProtocol
+from custom.custom_client import CustomProtocol
 
 def main(screen):
     if args.protocol == 'protobuf':
         p = ProtobufProtocol(args.host, int(args.port))
+    if args.protocol == 'custom':
+        p = CustomProtocol(args.host, int(args.port))
+
 
     window = Application(screen, p)
     window.run()    
@@ -23,7 +27,7 @@ if __name__ == "__main__":
     parser.add_argument('--port', dest='port', action='store',
             default='8080', help="Server's port (default=8080)")
     parser.add_argument('--host', dest='host', action='store',
-            default='localhost', help="Server host (default=localhost)")
+            default='0.0.0.0', help="Server host (default=0.0.0.0)")
 
     args = parser.parse_args()
 

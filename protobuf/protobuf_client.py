@@ -20,7 +20,7 @@ class ProtobufProtocol(Protocol):
 
     # RUN
     def __init__(self, host, port):
-        self.Channel = implementations.insecure_channel('localhost', port)
+        self.Channel = implementations.insecure_channel(host, port)
         self.Stub = obj.beta_create_ChatApp_stub(self.Channel)
 
     # MESSAGING 

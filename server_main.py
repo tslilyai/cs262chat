@@ -4,6 +4,7 @@ The main function to start and run the server lives here!
 import argparse
 
 from protobuf.protobuf_server import run as run_protobuf
+from custom.custom_server import run as run_custom
 
 def main():
     parser = argparse.ArgumentParser(description='Chat client.')
@@ -19,7 +20,8 @@ def main():
         run_protobuf(int(args.port))
         print "Running protobuf server"
     elif args.protocol == "custom":
-        custom_server.run(int(args.port))
+        run_custom(int(args.port))
+        print "Running custom server"
 
 if __name__ == '__main__':
     main()
