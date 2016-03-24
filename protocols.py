@@ -1,33 +1,72 @@
 '''
-THIS IS A CLIENT-FACING INTERFACE
+protocols.py defines three classes, Message, Group, User, and Protocol. 
 
-This defines an abstract protocol class that both communication protocols must implement
-Front end calls these function (client-side)
+Protocol is an abstract protocol class that exposes the client API for communicating
+to the server and other clients. 
+
+Message/Group/User objects are passed around and returned by the Protocol methods.
+
+Both communication protocols must implement this class.
 '''
 
 class Message(object):
+    '''
+    Message defines a message object, consisting of a 
+    message id, name of sender, identifier of the 
+    recipient, and the message itself.
+
+    Messages are the objects used to send and receive messages 
+    within the client protocols.
+    '''
     def __init__(self, m_id, from_name, to_id, msg):
+        '''
+        Initialize a Message object
+        :param m_id: integer uniquely identifying the message
+        :param from_name: string representing the name of the sender of the message
+        :param to_id: integer uniquely identifying the recipient of the message 
+        :param msg: string representing the message text
+        :return: an initialized Message object
+        '''
         self.m_id = m_id
         self.from_name = from_name
         self.to_id = to_id
         self.msg = msg
 
 class Group(object):
+    '''
+    Group
+    '''
     def __init__(self, g_id, g_name):
+        '''
+        Initialize a Group
+        :param g_id: integer uniquely identifying the group
+        :param g_name: string representing the name of the group 
+        :return: an initialized Group object
+        '''
         self.g_id = g_id
         self.g_name = g_name
 
 class User(object):
+    '''
+    User
+    '''
     def __init__(self, u_id, username):
+        '''
+        Initialize a User object
+        :param u_id: integer uniquely identifying the user
+        :param username: string representing the name of the user
+        :return: an initialized User object
+        '''
         self.u_id = u_id
         self.username = username
 
 class Protocol(object):
-    '''An abstract class representing a protocol'''
+    '''
+    Protocol is an abstract class representing a protocol
+    '''
     def __init__(self, host, port):
         raise NotImplementedError
 
-    # RUN
     def client_run(self, port="8080"):
         raise NotImplementedError
 

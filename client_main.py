@@ -1,5 +1,7 @@
 '''
-The main function to start and run the client lives here!
+client_main.py
+
+This runs the client application.
 '''
 
 import argparse
