@@ -1,3 +1,11 @@
+'''
+This script extracts the package sizes sent and received by the application.
+
+Imports:
+    - re (regular expressions) to extract packet sizes from output messages
+    - sys to read command line arguments
+'''
+
 import re
 import sys
 

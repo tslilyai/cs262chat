@@ -1,3 +1,8 @@
+# This script executes the commands in transcript.txt within the chat application 
+# and records the calls over the network made by the client.
+#
+# network.txt and log1.txt can then be passed to analyze.py to extract packet sizes
+
 echo "testing protocol $1"
 python server_main.py --port 12353 --protocol $1 > log1.txt 2>&1 &
 SERVER_PID=$!

@@ -16,7 +16,6 @@ def main(screen):
     if args.protocol == 'custom':
         p = CustomProtocol(args.host, int(args.port))
 
-
     window = Application(screen, p)
     window.run()    
 
