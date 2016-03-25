@@ -6,7 +6,11 @@ import sqlite3
 import sys
 
 def thread_safe(fn):
-    '''Wraps db functions to be thread-safe (i.e. per thread connections)'''
+    '''Wraps db functions to be thread-safe.
+    Every function invocation, it starts a new connection that it closes at the end.
+    For an internal function taking arguments (connection, cursor, args),
+    the wrapped function takes arguments (args).
+    '''
     def new_fn(self, *args, **kwargs):
         conn = sqlite3.connect('chatapp.db')
         c = conn.cursor()
@@ -21,14 +25,23 @@ def thread_safe(fn):
     return new_fn
 
 class DBManager(object):
+    '''
+    DBManager is the interface for the database layer of the application.
+    To use, create a DBManager instance, and call one of the instance methods.
+    Note that although instance methods appears to take conn and c as arguments,
+    because of the decorator, we don't need to pass these arguments in
+    '''
     def __init__(self):
         pass
 
-    # Note that although this function appears to take conn and c as arguments,
-    # because of the decorator, we don't need to pass these arguments in
     @thread_safe
     def create_tables(self, conn, c):
-        '''void create_tables(self): creates database tables for the app'''
+        '''
+        create_tables(self): creates database tables for the app
+
+        Returns None on success, raises an exception otherwise
+        :return: None on success, raise an exception on error
+        '''
         c.execute("""
             CREATE TABLE users (u_id int NOT NULL PRIMARY KEY, username varchar(255) UNIQUE)
         """)
@@ -48,7 +61,11 @@ class DBManager(object):
 
     @thread_safe
     def remove_tables(self, conn, c):
-        '''void create_tables(self): creates database tables for the app'''
+        '''
+        create_tables(self): creates database tables for the app
+
+        :return: None on success, raise an exception on error
+        '''
         c.execute("""
             DROP TABLE users
         """)
@@ -69,8 +86,12 @@ class DBManager(object):
     @thread_safe
     def get_or_create_vgid(self, conn, c, to_id, from_id):
         '''
-        int get_or_create_vgid(self, int to_id, int from_id):
-            returns the vgroup id for users to_id and from_id. Creates vgroup if it doesn't exist.
+        get_or_create_vgid: given to_id and from_id (both user ids), finds a virtual group
+        for these two users if it exists, or creates it if it does not.
+
+        :param to_id: integer; user id of user you're sending message to
+        :param from_id: integer; user id of user you're sending message from
+        :return: integer; the id of the created vgroup on success, raises on error.
         '''
         c.execute("SELECT g_id FROM vgroups WHERE (id1 = ? AND id2 = ?) OR (id2 = ? AND id1 = ?)",
                       [to_id, from_id, to_id, from_id])
@@ -95,10 +116,13 @@ class DBManager(object):
     @thread_safe
     def insert_message(self, conn, c, to_id, from_id, msg):
         '''
-        void insert_message(int to_id, int from_id, string msg):
-            creates a new message from from_id to to_id with content msg.
+        insert_message: creates a new message from from_id to to_id with content msg.
             from_id is the id of a user.
             to_id is the id of a group or vgroup.
+
+        :param to_id: integer; id of group or vgroup
+        :param from_id: integer; id of the user sending message
+        :return: None on success, raises on error
         '''
         if len(msg) > 1023:
             raise Exception('Message string too long')
@@ -122,8 +146,10 @@ class DBManager(object):
     @thread_safe
     def get_user_id(self, conn, c, u_name):
         '''
-        int get_user_id(string u_name):
-            returns the user id for user with username u_name
+        get_user_id: returns user id for user with given username
+
+        :param u_name: string; username of user
+        :return: integer; user id of user, raises on error (or if user doesn't exist)
         '''
         c.execute("SELECT u_id FROM users WHERE username=?", [u_name])
         v = c.fetchone()
@@ -135,8 +161,10 @@ class DBManager(object):
     @thread_safe
     def get_group_id(self, conn, c, g_name):
         '''
-        int get_group_id(string g_name):
-            returns the group id for group with name g_name
+        get_group_id: returns group id for group with given name
+
+        :param g_name: string; name of the group
+        :return integer representing id of group, raises on error (or if user doesn't exist)
         '''
         c.execute("SELECT g_id FROM groups WHERE g_name=?", [g_name])
         v = c.fetchone()
@@ -148,10 +176,14 @@ class DBManager(object):
     @thread_safe
     def get_messages(self, conn, c, u_id, checkpoint=0):
         '''
-        messages[] get_messages(int u_id, int checkpoint):
-            returns a list of dictionaries representing messages (fields m_id, to_id, from_name, msg)
-            that the user with id u_id could see.
-            All returned messages have id greater than checkpoint.
+        get_messages: returns messages that specified user could see
+        (messages addressed to that user or to a group the user belongs to),
+        with message id greater than a specified checkpoint.
+
+        :param u_id: integer; id of user
+        :param checkpoint: integer; represents last received message id. Default 0.
+        :return: a list of dictionaries representing messages (fields m_id, to_id, from_name, msg)
+            on success, raises on error
         '''
         c.execute("""
             SELECT messages.m_id, messages.to_id, messages.from_id, messages.msg
@@ -176,8 +208,10 @@ class DBManager(object):
     @thread_safe
     def create_group(self, conn, c, g_name):
         '''
-        void create_group(string g_name):
-            creates a group with name g_name.
+        create_group: creates a group with name g_name
+
+        :param g_name: string; name of group to be created
+        :return: None on success, raises on error
         '''
         c.execute("SELECT g_id FROM groups ORDER BY g_id DESC LIMIT 1")
         v = c.fetchone()
@@ -195,7 +229,7 @@ class DBManager(object):
         conn.commit()
 
     def _insert_ugpair(self, conn, c, u_id, g_id):
-        # helper function for associating user with group
+        # helper function for associating user with id u_id with group with id g_id
         c.execute("SELECT _id FROM user_group_pairs ORDER BY _id DESC LIMIT 1")
         npairs = c.fetchone()
         if npairs is None:
@@ -212,8 +246,10 @@ class DBManager(object):
     @thread_safe
     def create_account(self, conn, c, u_name):
         '''
-        void create_account(string u_name):
-            creates a new user with username u_name
+        create_account: creates a new user with username u_name
+
+        :param u_name: string; name of new user
+        :return: None on success, raises on error
         '''
         c.execute("SELECT u_id FROM users ORDER BY u_id DESC LIMIT 1")
         v = c.fetchone()
@@ -234,8 +270,11 @@ class DBManager(object):
     @thread_safe
     def add_group_member(self, conn, c, g_name, u_name):
         '''
-        void add_group_member(string g_name, string u_name):
-            adds user with username u_name to group with name g_name
+        add_group_member: adds user with username u_name to group with name g_name
+
+        :param g_name: string; name of group
+        :param u_name: string; name of user to add to group
+        :return: None on success, raises on error
         '''
         c.execute("SELECT u_id FROM users WHERE username=?", [u_name])
         u_id = c.fetchone()
@@ -264,8 +303,10 @@ class DBManager(object):
     @thread_safe
     def remove_account(self, conn, c, u_name):
         '''
-        void remove_account(string u_name):
-            Delete user with username u_name
+        remove_account: Delete user with username u_name
+
+        :param u_name: string; name of user to delete
+        :return: None on success, raises on error
         '''
         c.execute("SELECT u_id FROM users WHERE username=?", [u_name])
         v = c.fetchone()
@@ -281,8 +322,11 @@ class DBManager(object):
     @thread_safe
     def remove_group_member(self, conn, c, g_name, u_name):
         '''
-        void remove_group_member(string g_name, string u_name):
-            Delete user with username u_name from group with name g_name
+        remove_group_member: Delete user with username u_name from group with name g_name
+
+        :param g_name: string; name of group
+        :param u_name: string; name of user to remove from group
+        :return: None on success, raises on error
         '''
         c.execute("SELECT u_id FROM users WHERE username=?", [u_name])
         uid = c.fetchone()
@@ -304,8 +348,11 @@ class DBManager(object):
     @thread_safe
     def edit_group_name(self, conn, c, g_name, newname):
         '''
-        void edit_group_name(string name, string newname):
-            changes name of group with name g_name to newname
+        edit_group_name: change name of group with name g_name to newname
+
+        :param g_name: string; the old name of the group
+        :param newname: string; the new name of the group
+        :return: None on success, raises on error
         '''
         c.execute("UPDATE groups SET g_name=? WHERE g_name=?", [newname, g_name])
         conn.commit()
@@ -313,9 +360,11 @@ class DBManager(object):
     @thread_safe
     def get_groups(self, conn, c, pattern):
         '''
-        list(group) get_groups(string pattern):
-            returns a list of groups whose names matches pattern.
+        get_groups: returns a list of groups whose names matches pattern.
             pattern is specified in SQL pattern syntax.
+
+        :param pattern: string; pattern to match, specified in SQL pattern syntax
+        :return: list of dictionaries representing groups (fields: group id, group name)
         '''
         c.execute("SELECT g_id, g_name FROM groups WHERE g_name LIKE ?", [pattern])
         groups = c.fetchall()
@@ -326,9 +375,11 @@ class DBManager(object):
     @thread_safe
     def get_accounts(self, conn, c, pattern):
         '''
-        list(user) get_accounts(string pattern):
-            returns a list of users whose usernames matches pattern.
+        get_accounts: returns a list of users whose usernames matches pattern.
             pattern is specified in SQL pattern syntax.
+
+        :param pattern: string; pattern to match, specified in SQL pattern syntax
+        :return: list of dictionaries representing users (fields: user id, username)
         '''
         c.execute("SELECT u_id, username FROM users WHERE username LIKE ? ORDER BY u_id ASC", [pattern])
         users = c.fetchall()
@@ -339,8 +390,11 @@ class DBManager(object):
     @thread_safe
     def get_group_members(self, conn, c, g_name):
         '''
-        list(user) get_group_members(string g_name):
-            returns a list of users belong to group with name g_name
+        get_group_members: returns a list of users belong to group with name g_name
+
+        :param g_name: string; name of group
+        :return: list of dictionaries representing users belonging to group
+            (fields: user id, username)
         '''
         c.execute("""
             SELECT users.u_id, users.username FROM
@@ -353,6 +407,9 @@ class DBManager(object):
         return [{'u_id': u[0], 'username': u[1]} for u in users]
 
 def test(db):
+    '''
+    Given a clean database (no tables), tests all our database functionality.
+    '''
     db.create_tables()
     db.create_account("fding")
     db.create_account("tslilyai")
