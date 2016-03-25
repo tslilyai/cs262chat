@@ -1,7 +1,11 @@
 '''
 client_main.py
 
-This runs the client application.
+This runs the client application, which calls the protocol API
+specified by the Protocol class in order to communicate with the server
+and other clients.
+
+Usage: python client_main.py --protocol [default:protobuf] --port [default:8080] --host [default:0.0.0.0]
 '''
 
 import argparse

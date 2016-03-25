@@ -15,14 +15,11 @@ class TimeoutResponse:
         self.status_code = requests.codes.not_found
 
 class CustomProtocol(Protocol):
-
-    def __get_response(self, response):
-        if response.status_code != requests.codes.ok:
-            return "Error: %s" % response.text
-        else: 
-            return None
-    
     '''
+    CustomProtocol implements the abstract Protocol class (protocols.py).
+    
+    All functions behave as specified in the documentation for the Protocol class
+
     How to make requests:
     
     Create an object with self.__create_object:
@@ -33,6 +30,12 @@ class CustomProtocol(Protocol):
     Pass the JSON dump to either __send_get or __send_post
     Pass that to __get_response when necessary
     '''
+
+    def __get_response(self, response):
+        if response.status_code != requests.codes.ok:
+            return "Error: %s" % response.text
+        else: 
+            return None
     
     def __create_object(self, action, actor=None, setting=None, target=None, value=None):
         ret = {}

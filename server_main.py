@@ -1,5 +1,13 @@
 '''
-The main function to start and run the server lives here!
+The main function to start and run the server lives here.
+
+This runs the server-side application, which listens to calls from the client application
+via the specified protocol, and communicates with the database in order to store and retrieve
+client information.
+
+Logs of all server calls and responses are printed to console.
+
+Usage: python server_main.py --protocol [default:protobuf] --port [default:8080]
 '''
 import argparse
 
