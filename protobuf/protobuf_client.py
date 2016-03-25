@@ -11,8 +11,22 @@ from protocols import Protocol, Message, User, Group
 _TIMEOUT_SECONDS = 30
 
 class ProtobufProtocol(Protocol):
+    '''
+    ProtobufProtocol implements the abstract Protocol class (protocols.py).
+    
+    Communication with the protobuf server is done via sending proto objects defined in 
+    service.proto.
 
+    All functions behave as specified in the documentation for the Protocol class
+    '''
     def __get_response(self, response):
+        '''
+        __get_response is an internal function that takes
+        a response message and returns either a
+        error, or None if no error occurred
+        :param response: string returned from the server
+        :return: None or error string if response indicates an error 
+        '''
         if response.errno:
             return "Error: %s" % response.msg
         else: 
