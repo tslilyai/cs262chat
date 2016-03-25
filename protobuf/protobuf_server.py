@@ -10,8 +10,9 @@ def add_logging(fn):
     Prints out the function name, function arguments with which the function
     was called, and the return value.
 
-    :param fn: function whose calls to wrap and log
-    :return: the passed in function
+    :param fn: function whose calls we want to log
+        fn is assumed to take as arguments request and context
+    :return: a new function that does logging before and after calling fn
     '''
     def fun(self, request, context):
         print '========================================================='
@@ -24,9 +25,8 @@ def add_logging(fn):
 
 def list_to_protobuf(tpe):
     '''
-    XXX CHECK THIS
-    Higher-level function that converts a list of objects returns from the database
-    to the corresponding protobuf objects to be sent to the client-protobuf layer.
+    Higher-level function that returns a function wrap that, given a function returning lists of database objects,
+    returns a generator that yields the corresponding protobuf objects to be sent to the client-protobuf layer.
 
     :param tpe: the protobuf object type to convert to
     :return: a function that wraps the return value of another function as the specified protobuf object type 
@@ -35,8 +35,9 @@ def list_to_protobuf(tpe):
         ''' 
         wraps the function that returns the list of values to be converted to protobuf object types
 
-        :param f: the function whose return value is to be converted to a protobuf object type
-        :return: the wrapping function
+        :param f: the function whose return value is to be converted to a protobuf object type.
+            f is assumed to take as arguments request, context, and possibly other arguments
+        :return: a function that yields protobuf objects instead of returning a giant list of database objects
         '''
         def wrapped(self, request, context, *args, **kwargs):
             '''
