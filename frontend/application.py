@@ -28,6 +28,17 @@ class LoginUser(object):
 # When you enter command mode
 # call setLines(self.cmd_history)
 class Application(object):
+    '''
+    Application is a class that 
+
+        Mode:
+            mode -1 corresponds to "command mode", in which the command input window
+            is displayed and the user's input 
+
+            mode m for m != -1 corresponds to "chat mode", in which the user can
+            send and see their messages with another group or user. m corresponds 
+            to the conversation id of the group/user with which the user is chatting.    
+    '''
     DOWN = 1
     UP = -1
     ESC_KEY = 27
@@ -66,6 +77,10 @@ class Application(object):
     } 
 
     def __init__(self, screen, protocol):
+        ''' 
+        Initializes the application window with both a display and an input screen.
+
+        '''
         self.screen = screen
         curses.noecho()
         curses.cbreak()
@@ -99,7 +114,8 @@ class Application(object):
             for m in msgs:
                 self.current_user.add_message(m)
             if self.mode != -1:
-                # This setLines is necessary since in Python, an empty list and a nonempty list will point to different objects in memory
+                # This setLines is necessary since in Python, an empty list and a 
+                # nonempty list will point to different objects in memory
                 self.display.setLines(self.current_user.formatted_messages[self.mode])
                 self.displayScreen()
         

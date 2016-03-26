@@ -12,6 +12,10 @@ import curses
 import sys
 
 class DisplayScreen:
+    '''
+    DisplayScreen defines a curses screen in text can be displayed.
+    It also provides scrolling functionality with the arrow keys.
+    '''
     DOWN = 1
     UP = -1
     ESC_KEY = 27
@@ -20,6 +24,14 @@ class DisplayScreen:
     screen = None
             
     def __init__(self, window):
+        '''
+        Initialize a display screen, setting the top line to 0 and the lines to display
+        to the screen as empty.
+
+        :param window: the curses window object which should represent the display screen
+        :return: DisplayScreen object
+        '''
+
         self.screen = window
         self.screen.border(0)
         self.topLineNum = 0
@@ -27,6 +39,16 @@ class DisplayScreen:
         self.nOutputLines = 0
 
     def setLines(self, lines, adjust=False):
+        '''
+        Changes the set of lines that is displayed on the display screen.
+        Displays the last n lines of the entire output lines list to display, where n is the 
+        height of the screen window.
+        If requested (adjust = True), this shows first n lines of the set of lines to display
+
+        :param lines: the lines to display on the screen
+        :param adjust: if True, shows the first n lines of the set of the lines to display instead of the last n lines (default False) 
+        :return: void
+        '''
         was_last_page = self.topLineNum + self.screen.getmaxyx()[0] >= self.nOutputLines + 1
         self.outputLines = lines
         self.nOutputLines = len(lines)
@@ -39,6 +61,12 @@ class DisplayScreen:
         self.displayScreen()
 
     def displayScreen(self):
+        '''
+        Displays a page of lines on the screen. Use setLines to determine which page of lines to display.
+        Called by Application object to display application output.
+
+        :return: void
+        '''
         # clear screen
         self.screen.erase()
 
@@ -51,6 +79,14 @@ class DisplayScreen:
         self.screen.refresh()
 
     def updown(self, increment):
+        '''
+        Moves the set of lines to display either up or down depending on the
+        user's keypress.
+
+        :param increment: UP if the up arrow was pressed, and DOWN if the down arrow was pressed. 
+                          specifies the direction in which the top line number should be moved.
+        :return: void
+        '''
         if increment == self.UP and self.topLineNum > 0:
             self.topLineNum += self.UP 
             return
@@ -59,8 +95,18 @@ class DisplayScreen:
             return
 
     def pageup(self):
+        '''
+        Moves the set of lines to display up a page 
+
+        :return: void
+        '''
         self.topLineNum = max(0, self.topLineNum - (self.screen.getmaxyx()[0]-1))
 
     def pagedown(self):
+        '''
+        Moves the set of lines to display down a page 
+
+        :return: void
+        '''
         self.topLineNum = min(max(0, self.nOutputLines - self.screen.getmaxyx()[0] + 1),
                 self.topLineNum + (self.screen.getmaxyx()[0]-1))
