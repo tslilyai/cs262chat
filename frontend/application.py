@@ -7,6 +7,13 @@ from frontend.inputw import InputWindow
 from protocols import Message
 
 class LoginUser(object):
+    '''LoginUser: a representation of a logged in user.
+    We keep track of messages received by the user that are fetched from the server already
+    (in the messages field, a dictionary mapping the conversation id to the message).
+    We also keep track of the id of the last fetched message,
+    along with other properties of the user.
+    '''
+
     def __init__(self, username, u_id, checkpoint = 0):
         self.username = username
         self.u_id = u_id
@@ -15,6 +22,13 @@ class LoginUser(object):
         self.formatted_messages = {}
 
     def add_message(self, message):
+        '''
+        add_message: adds this message to this LoginUser's dictionary of messages,
+        and updates the checkpoint.
+
+        :param message: a Message object
+        :return: None
+        '''
         if message.to_id not in self.messages:
             self.messages[message.to_id] = []
             self.formatted_messages[message.to_id] = []
@@ -29,15 +43,15 @@ class LoginUser(object):
 # call setLines(self.cmd_history)
 class Application(object):
     '''
-    Application is a class that 
+    Application represents the entire state of the application: the current LoginUser (if applicable),
+    the input window, the display window, the message fetching thread, and the *mode*.
+    There are two modes, command mode and chat mode, and the current mode is stored in the mode field.
+        mode -1 corresponds to "command mode", in which the command input window
+        is displayed and the user's input 
 
-        Mode:
-            mode -1 corresponds to "command mode", in which the command input window
-            is displayed and the user's input 
-
-            mode m for m != -1 corresponds to "chat mode", in which the user can
-            send and see their messages with another group or user. m corresponds 
-            to the conversation id of the group/user with which the user is chatting.    
+        mode m for m != -1 corresponds to "chat mode", in which the user can
+        send and see their messages with another group or user. m corresponds 
+        to the conversation id of the group/user with which the user is chatting.    
     '''
     DOWN = 1
     UP = -1
@@ -78,8 +92,11 @@ class Application(object):
 
     def __init__(self, screen, protocol):
         ''' 
-        Initializes the application window with both a display and an input screen.
+        __init__: Initializes the application window with both a display and an input screen.
 
+        :param screen: A curses window object, representing the root window that the application runs in
+        :param protocol: A protocols.Protocol object that the application will use to communicate with
+            the server.
         '''
         self.screen = screen
         curses.noecho()
@@ -105,12 +122,19 @@ class Application(object):
         input_window.refresh()
 
     def poll_for_messages(self, delay = 1):
+        '''
+        poll_for_messages: An infinite loop, supposed to be run in a separate thread,
+        that polls the server every delay seconds for new messages for the logged in user
+        (or waits until a user logs in)
+
+        :param delay: number of seconds between each polling attempt
+        :return: None
+        '''
         while not self.exited:
             time.sleep(delay)
             if self.current_user is None:
                 continue
             msgs = self.P.fetch_messages(self.current_user.u_id, self.current_user.checkpoint)
-            # TODO: concurrency
             for m in msgs:
                 self.current_user.add_message(m)
             if self.mode != -1:
@@ -120,6 +144,11 @@ class Application(object):
                 self.displayScreen()
         
     def run(self):
+        '''
+        run: The main loop of the application. Waits for user inputs, and acts accordingly.
+
+        :return: None
+        '''
         thread.start_new_thread(self.poll_for_messages, tuple())
         self.addCmdLine("Welcome to Chat!")
         self.addCmdLine("Login to start chatting, or type help to get a list of valid commands.")
@@ -164,13 +193,30 @@ class Application(object):
                 pass
 
     def displayScreen(self):
+        '''
+        displayScreen: updates the display and input screens.
+
+        :return: None
+        '''
         self.display.displayScreen()
         self.input_w.displayScreen()
 
     def addCmdLine(self, line):
+        '''
+        addCmdLine: add a command to the command history.
+
+        :param line: string; the command to add
+        :return: None
+        '''
         self.cmd_history.append(line)
 
     def execute_cmd(self, cmd):
+        '''
+        execute_cmd: interprets the given command to perform an action.
+
+        :param cmd: string; the command to execute
+        :return: None
+        '''
         # add the cmd to the outputLines
         cmd_args = cmd.strip().split()
         if not cmd_args:

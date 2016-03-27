@@ -41,9 +41,15 @@ class DisplayScreen:
     def setLines(self, lines, adjust=False):
         '''
         Changes the set of lines that is displayed on the display screen.
-        Displays the last n lines of the entire output lines list to display, where n is the 
-        height of the screen window.
-        If requested (adjust = True), this shows first n lines of the set of lines to display
+        Calculates the range of lines to display according to the following rule:
+            if adjust is true, we always display the last n lines
+            if adjust is not true, we display the last n lines if the previous display
+                showed the last n lines; otherwise, we show the same set of lines as the previous display
+
+        The rationale for this logic is, if the user is viewing previous messages, we don't want
+        to scroll to the bottom every time a new message comes in.
+        However, if we are at the very bottom, we want to see new messages, instead of having to scroll down
+        to see them.
 
         :param lines: the lines to display on the screen
         :param adjust: if True, shows the first n lines of the set of the lines to display instead of the last n lines (default False) 

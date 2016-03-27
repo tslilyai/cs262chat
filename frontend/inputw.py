@@ -31,9 +31,10 @@ class InputWindow(object):
         to a log file (log.txt).
         Special keys, such as arrow keys, shift the position of the cursor on the window
         screen or display a history of commands.
-        Deletion of characters is also supported.
+        Deletion of characters is also supported,
+        along with certain Emacs commands for moving the cursor (e.g. Ctrl-A, Ctrl-E, Ctrl-K).
 
-        :param c: the character to display on the screen 
+        :param c: the character read from the keyboard
         :return: void
         '''
         with open('log.txt', 'a') as f:
