@@ -26,6 +26,7 @@ class CustomProtocol(Protocol):
         action is necessary
         actor, setting, target, value change depending on method, but do
             what makes sense
+        look at comments if something is unclear
     Dump the object to JSON
     Pass the JSON dump to either __send_get or __send_post
     Pass that to __get_response when necessary

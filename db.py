@@ -1,5 +1,6 @@
 '''
 This file contains all functions necessary for the server to interface with the database!
+Also contains a driver to set up the database
 '''
 
 import sqlite3
@@ -519,6 +520,18 @@ def test(db):
     print 'Passed all tests'
 
 if __name__ == '__main__':
+    '''
+    Driver function to set up database and run tests
+
+        python db.py [init|clean|test]
+
+    init: sets up an empty database that the server can run off of
+    clean: empties the database so there are no users, messages, etc, but tables
+        are there so the server can function
+    test: sets up an empty database and runs tests - database will be populated
+        with some default values
+    '''
+
     db = DBManager()
 
     if len(sys.argv) == 2:
