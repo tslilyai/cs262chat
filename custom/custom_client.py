@@ -30,6 +30,12 @@ class CustomProtocol(Protocol):
     Dump the object to JSON
     Pass the JSON dump to either __send_get or __send_post
     Pass that to __get_response when necessary
+
+    In-line documentation in this class purposely put before each function
+    to match amount of in-function block comments in protobuf_client.py;
+    also, this file has a pretty strong dependency on custom_server.py, and
+    we want to force users to look at both if they want to mess with an
+    existing interface or add a new interface.
     '''
 
     def __get_response(self, response):
@@ -136,12 +142,12 @@ class CustomProtocol(Protocol):
         payload = self.__create_object('group-name-edit', target=old_name, value=new_name)
         return self.__get_response(self.__send_post(payload))
         
-    # action: group-edit-name, target: groupname, value: member
+    # action: group-remove-name, target: groupname, value: member
     def remove_group_member(self, groupname, member):
         payload = self.__create_object('group-member-remove', target=groupname, value=member)
         return self.__get_response(self.__send_post(payload))
         
-    # action: group-edit-name, target: groupname, value: member
+    # action: group-add-name, target: groupname, value: member
     def add_group_member(self, groupname, member):
         payload = self.__create_object('group-member-add', target=groupname, value=member)
         return self.__get_response(self.__send_post(payload))
